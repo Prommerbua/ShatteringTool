@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class Triangle
 {
-    //Vertices, Edges
-    public List<Vertex2D> vertices;
+    public Edge2D incEdge;
 
+    public Triangle(Edge2D incEdge)
+    {
+        this.incEdge = incEdge;
+    }
 
     public bool isBad = false;
 

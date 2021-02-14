@@ -231,7 +231,7 @@ GameObject:
   - component: {fileID: 854619673}
   - component: {fileID: 854619672}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: DelaunayTriangulation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

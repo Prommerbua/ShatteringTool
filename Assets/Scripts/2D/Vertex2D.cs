@@ -6,6 +6,7 @@ public class Vertex2D
 {
     public int x;
     public int y;
+    public Edge2D incEdge;
 
     public Vertex2D(int x, int y)
     {

@@ -36,29 +36,6 @@ public class PointCloudOnTexture : MonoBehaviour
         points = new List<Vector2>();
 
         CreateRandomPointCloud(numberOfPoints);
-        DelaunayTriangulation();
-    }
-
-    private void DelaunayTriangulation()
-    {
-        List<Triangle> triangulation = new List<Triangle>();
-        Triangle superTriangle = new Triangle();
-
-        Vertex2D v1 = new Vertex2D(-1, -1);
-        Vertex2D v2 = new Vertex2D(resolutionWidth * 2 + 1, -1);
-        Vertex2D v3 = new Vertex2D(-1, resolutionHeight * 2 + 1);
-
-        superTriangle.vertices = new List<Vertex2D>();
-        superTriangle.vertices.Add(v1);
-        superTriangle.vertices.Add(v2);
-        superTriangle.vertices.Add(v3);
-
-        triangulation.Add(superTriangle);
-
-        foreach (var point in points)
-        {
-            List<Triangle> badTriangles = new List<Triangle>();
-        }
     }
 
     private void CreateRandomPointCloud(int count)
