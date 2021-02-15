@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class Vertex2D
 {
-    public int x;
-    public int y;
-    public Edge2D incEdge;
+    public Vector2 Pos;
+    public Edge2D IncEdge;
 
     public Vertex2D(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        this.Pos.x = x;
+        this.Pos.y = y;
+    }
+
+    public Vertex2D(Vector2 pos)
+    {
+        this.Pos = pos;
     }
 }

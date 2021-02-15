@@ -64,6 +64,7 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Rider files
+.idea/
 *.iws
 workspace.xml
 tasks.xml

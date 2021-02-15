@@ -15,4 +15,18 @@ public class Edge2D
         this.org = org;
     }
 
+    //get corresponding vertices from triangle
+    public Vertex2D[] GetTriangleVertices()
+    {
+        if (left == null)
+        {
+            Debug.LogWarning("No Triangle on this Edge");
+            return null;
+        }
+        return new[]
+        {
+            org, next.org, prev.org
+        };
+    }
+
 }
