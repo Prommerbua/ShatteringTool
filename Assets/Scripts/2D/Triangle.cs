@@ -1,69 +1,78 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Triangle
 {
-    public Edge2D incEdge;
+    public Vector2 V1;
+    public Vector2 V2;
+    public Vector2 V3;
 
-    public Triangle(Edge2D incEdge)
-    {
-        this.incEdge = incEdge;
-    }
+    public Edge E1;
+    public Edge E2;
+    public Edge E3;
 
-    public bool isBad = false;
     private Vector2 _circumcirclePosition;
-    private float _circumcircleRadius;
+    public float CircumcircleRadius;
 
+    public Triangle(Vector2 v1, Vector2 v2, Vector2 v3)
+    {
+        this.V1 = v1;
+        this.V2 = v2;
+        this.V3 = v3;
+
+        E1 = new Edge(V1, V2);
+        E2 = new Edge(V2, V3);
+        E3 = new Edge(V3, V1);
+    }
 
     public Vector2 CalculateCircumcirclePosition()
     {
-        //get triangle vertices
-        var vertices = incEdge.GetTriangleVertices();
-        var v1 = vertices[0];
-        var v2 = vertices[1];
-        var v3 = vertices[2];
+        var A = Vector2.zero;
+        var B = V2 - V1;
+        var C = V3 - V1;
 
-        var D = 2 * (v1.Pos.x * (v2.Pos.y - v3.Pos.y) + v2.Pos.x * (v3.Pos.y - v1.Pos.y) +
-                     v3.Pos.x * (v2.Pos.y - v1.Pos.y));
+        var D = 2 * (B.x * C.y - B.y * C.x);
 
-        var Ux = (1 / D) * ((v1.Pos.x * v1.Pos.x + v1.Pos.y * v1.Pos.y) * (v2.Pos.y - v3.Pos.y) +
-                            (v2.Pos.x * v2.Pos.x + v2.Pos.y * v2.Pos.y) * (v3.Pos.y - v1.Pos.y) +
-                            (v3.Pos.x * v3.Pos.x + v3.Pos.y * v3.Pos.y) * (v1.Pos.y - v2.Pos.y));
+        var Ux = (C.y * (B.x * B.x + B.y * B.y) - B.y * (C.x * C.x + C.y * C.y)) / D;
+        var Uy = (B.x * (C.x * C.x + C.y * C.y) - C.x * (B.x * B.x + B.y * B.y)) / D;
 
-        var Uy = (1 / D) * ((v1.Pos.x * v1.Pos.x + v1.Pos.y * v1.Pos.y) * (v3.Pos.x - v2.Pos.x) +
-                            (v2.Pos.x * v2.Pos.x + v2.Pos.y * v2.Pos.y) * (v1.Pos.x - v3.Pos.x) +
-                            (v3.Pos.x * v3.Pos.x + v3.Pos.y * v3.Pos.y) * (v2.Pos.x - v1.Pos.x));
+        _circumcirclePosition = new Vector2(Ux,Uy) + V1;
+        CircumcircleRadius =    new Vector2(Ux, Uy).magnitude;
 
-        _circumcirclePosition = new Vector2(Ux,Uy);
-        _circumcircleRadius = (_circumcirclePosition - v1.Pos).magnitude;
 
-        return new Vector2(Ux,Uy);
+        return new Vector2(Ux,Uy) + V1;
+    }
+
+    public Vector2 CalculateCentroidPosition()
+    {
+        var c =  (V1 + V2 + V3) / 3;
+        return c;
     }
 
     public bool IsPointInsideCircumcircle(Vector2 point)
     {
         var length = (_circumcirclePosition - point).magnitude;
-        return _circumcircleRadius - length > 0;
+        return CircumcircleRadius - length > 0;
     }
 
-    public List<Edge2D> GetEdges()
+    public List<Edge> GetEdges()
     {
-        List<Edge2D> edges = new List<Edge2D>();
+        List<Edge> edges = new List<Edge>();
 
-        edges.Add(incEdge);
-        edges.Add(incEdge.next);
-        edges.Add(incEdge.prev);
+        edges.Add(E1);
+        edges.Add(E2);
+        edges.Add(E3);
         return edges;
     }
 
-    public List<Vertex2D> GetVertices()
+    public List<Vector2> GetVertices()
     {
-        List<Vertex2D> vertices = new List<Vertex2D>();
+        List<Vector2> vertices = new List<Vector2>();
 
-        vertices.Add(incEdge.org);
-        vertices.Add(incEdge.twin.org);
-        vertices.Add(incEdge.prev.org);
+        vertices.Add(V1);
+        vertices.Add(V2);
+        vertices.Add(V3);
         return vertices;
     }
 }

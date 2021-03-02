@@ -8,7 +8,7 @@ public class Edge2D
     public Edge2D twin;
     public Edge2D prev;
     public Edge2D next;
-    public Triangle left;
+    public Face left;
 
     public Edge2D(Vertex2D org)
     {
