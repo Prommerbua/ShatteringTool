@@ -251,7 +251,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 100
   height: 50
-  pointCount: 100
+  pointCount: 10
+  pointRadius: 0.5
+  pointColor: {r: 1, g: 0, b: 0, a: 1}
+  delaunayLineColor: {r: 1, g: 1, b: 1, a: 1}
+  drawTriangleNumbers: 0
+  drawDelaunay: 1
+  drawVoronoi: 0
+  drawCircumcenter: 0
 --- !u!4 &854619673
 Transform:
   m_ObjectHideFlags: 0

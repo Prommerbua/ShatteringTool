@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 public class BowyerWatson : MonoBehaviour
 {
@@ -10,15 +14,26 @@ public class BowyerWatson : MonoBehaviour
     public int pointCount;
     private List<Vector2> _points;
     private List<Triangle> _triangulation;
+    Dictionary<Vector2, List<Triangle>> _vertexTriangleMap;
+
 
     private DCEL2D _dcel;
+
+
+    [SerializeField] private float pointRadius = 0.5f;
+    [SerializeField] private Color pointColor = Color.red;
+    [SerializeField] private Color delaunayLineColor = Color.white;
+    [SerializeField] private bool drawTriangleNumbers = false;
+    [SerializeField] private bool drawDelaunay = true;
+    [SerializeField] private bool drawVoronoi;
+    [SerializeField] private bool drawCircumcenter;
+
 
     // Start is called before the first frame update
     void Start()
     {
         _points = new List<Vector2>();
         _triangulation = new List<Triangle>();
-        _dcel = new DCEL2D();
         for (int i = 0; i < pointCount; i++)
         {
             var x = Random.Range(0, width);
@@ -26,8 +41,17 @@ public class BowyerWatson : MonoBehaviour
             _points.Add(new Vector2(x, y));
         }
 
+        // _points.Add(new Vector2(15, 10));
+        // _points.Add(new Vector2(30, 40));
+        // _points.Add(new Vector2(40, 25));
+        // _points.Add(new Vector2(43, 30));
+        // _points.Add(new Vector2(50, 27));
+        // _points.Add(new Vector2(60, 5));
+        // _points.Add(new Vector2(70, 40));
+
         DelaunayTriangulation();
     }
+
 
     private void DelaunayTriangulation()
     {
@@ -36,7 +60,7 @@ public class BowyerWatson : MonoBehaviour
         Vector2 v2 = new Vector2((int) (width * 2 + 1), -1);
         Vector2 v3 = new Vector2(-1, (int) (height * 2 + 1));
 
-        var t = new Triangle(v1,v2,v3);
+        var t = new Triangle(v1, v2, v3);
         _triangulation.Add(t);
 
         foreach (var point in _points)
@@ -69,13 +93,9 @@ public class BowyerWatson : MonoBehaviour
                             break;
                         }
                     }
+
                     //Check if edge is shared
-                    //if (edge.twin.left != null && edge.left != null) Debug.Log("Edge Shared");
-                    if(shared) Debug.Log("Edge Shared");
-                    else
-                    {
-                        polygon.Add(edge);
-                    }
+                    if (!shared) polygon.Add(edge);
                 }
             }
 
@@ -101,69 +121,100 @@ public class BowyerWatson : MonoBehaviour
                     _triangulation.Remove(triangle);
                 }
             }
+        }
 
+        _dcel = new DCEL2D(_triangulation);
+
+
+        _vertexTriangleMap = new Dictionary<Vector2, List<Triangle>>();
+        foreach (var triangle in _triangulation)
+        {
+            foreach (var vertex in triangle.GetVertices())
+            {
+                if (_vertexTriangleMap.ContainsKey(vertex))
+                {
+                    _vertexTriangleMap[vertex].Add(triangle);
+                }
+                else
+                {
+                    _vertexTriangleMap.Add(vertex, new List<Triangle> {triangle});
+                }
+            }
         }
     }
 
-
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-
-        Gizmos.DrawSphere(new Vector2(-1, -1), 1f);
-        Gizmos.DrawSphere(new Vector2((int) (width * 2 + 1), -1), 1f);
-        Gizmos.DrawSphere(new Vector2(-1, (int) (height * 2 + 1)), 1f);
+        Gizmos.color = pointColor;
 
         if (_points != null)
         {
             foreach (var point in _points)
             {
-                Gizmos.DrawSphere(point, 0.8f);
+                Gizmos.DrawSphere(point, pointRadius);
             }
         }
 
-        Gizmos.color = Color.white;
-        if (_dcel != null)
+        if (_triangulation != null)
         {
-            int count = 0;
-            foreach (var triangle in _triangulation)
+            if (drawDelaunay)
             {
+                int count = 0;
+                foreach (var triangle in _triangulation)
+                {
+                    Gizmos.color = delaunayLineColor;
 
-                Gizmos.color = Color.white;
-
-                var vertices = triangle.GetVertices();
-                // Gizmos.DrawLine(new Vector2(triangle.incEdge.org.Pos.x, triangle.incEdge.org.Pos.y),
-                //     new Vector2(triangle.incEdge.twin.org.Pos.x, triangle.incEdge.twin.org.Pos.y));
-                // Gizmos.DrawLine(new Vector2(triangle.incEdge.next.org.Pos.x, triangle.incEdge.next.org.Pos.y),
-                //     new Vector2(triangle.incEdge.next.twin.org.Pos.x, triangle.incEdge.next.twin.org.Pos.y));
-                // Gizmos.DrawLine(new Vector2(triangle.incEdge.prev.org.Pos.x, triangle.incEdge.prev.org.Pos.y),
-                //     new Vector2(triangle.incEdge.prev.twin.org.Pos.x, triangle.incEdge.prev.twin.org.Pos.y));
-
-                Gizmos.DrawLine(vertices[0], vertices[1]);
-                Gizmos.DrawLine(vertices[1], vertices[2]);
-                Gizmos.DrawLine(vertices[2], vertices[0]);
+                    var vertices = triangle.GetVertices();
+                    Gizmos.DrawLine(vertices[0], vertices[1]);
+                    Gizmos.DrawLine(vertices[1], vertices[2]);
+                    Gizmos.DrawLine(vertices[2], vertices[0]);
 
 
-                GUIStyle g = new GUIStyle();
-                g.normal.textColor = Color.white;
-                g.fontSize = 30;
+                    GUIStyle g = new GUIStyle();
+                    g.normal.textColor = Color.white;
+                    g.fontSize = 30;
 
-                //Handles.Label(triangle.CalculateCentroidPosition(), count.ToString(), g);
+                    if (drawTriangleNumbers)
+                    {
+                        Handles.Label(triangle.CalculateCentroidPosition(), count.ToString(), g);
+                    }
 
-                count++;
+                    if (drawCircumcenter)
+                    {
+                        Gizmos.DrawSphere(triangle.CalculateCircumcirclePosition(), 0.6f);
+                    }
 
-                Gizmos.color = Color.blue;
-                //Gizmos.DrawWireSphere(triangle.CalculateCircumcirclePosition(), triangle.CircumcircleRadius);
+                    count++;
+
+                    //Gizmos.DrawWireSphere(triangle.CalculateCircumcirclePosition(), triangle.CircumcircleRadius);
+                }
+            }
+        }
+
+        if (_vertexTriangleMap != null)
+        {
+            if (drawVoronoi)
+            {
+                Gizmos.color = Color.cyan;
+                foreach (var triangle in _triangulation)
+                {
+                    foreach (var triangle2 in _triangulation)
+                    {
+                        if (triangle.HasSharedEdge(triangle2))
+                        {
+                            Gizmos.DrawLine(triangle.CalculateCircumcirclePosition(),
+                                triangle2.CalculateCircumcirclePosition());
+                        }
+                    }
+                }
             }
         }
 
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(new Vector2(0, 0), new Vector2(0, height));
-        Gizmos.DrawLine(new Vector2(0, 0), new Vector2(width, 0));
-        Gizmos.DrawLine(new Vector2(width, 0), new Vector2(width, height));
-        Gizmos.DrawLine(new Vector2(0, height), new Vector2(width, height));
+        // Gizmos.DrawLine(new Vector2(0, 0), new Vector2(0, height));
+        // Gizmos.DrawLine(new Vector2(0, 0), new Vector2(width, 0));
+        // Gizmos.DrawLine(new Vector2(width, 0), new Vector2(width, height));
+        // Gizmos.DrawLine(new Vector2(0, height), new Vector2(width, height));
     }
 }
-
-

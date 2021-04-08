@@ -75,4 +75,18 @@ public class Triangle
         vertices.Add(V3);
         return vertices;
     }
+
+    public bool HasSharedEdge(Triangle other)
+    {
+        bool shared = false;
+        foreach (var edge in GetEdges())
+        {
+            if (edge == other.E1 || edge == other.E2 || edge == other.E3)
+            {
+                shared = true;
+                break;
+            }
+        }
+        return shared;
+    }
 }

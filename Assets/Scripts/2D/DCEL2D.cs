@@ -6,14 +6,28 @@ using UnityEngine;
 
 public class DCEL2D
 {
-    public List<Face> Triangles;
+    public List<Face> Faces;
     public List<Vertex2D> Vertices;
+    public List<Edge2D> Edges;
 
-    public DCEL2D()
+
+    public DCEL2D(List<Triangle> triangles)
     {
-        Triangles = new List<Face>();
+        Faces = new List<Face>();
         Vertices = new List<Vertex2D>();
+        Edges = new List<Edge2D>();
+
+        InitializeDCEL(triangles);
     }
+
+    private void InitializeDCEL(List<Triangle> triangles)
+    {
+        foreach (var triangle in triangles)
+        {
+
+        }
+    }
+
 
     public void AddTriangle(Vertex2D v1, Vertex2D v2, Vertex2D v3)
     {
@@ -82,7 +96,7 @@ public class DCEL2D
             v2.IncEdge.left = t;
             v2.IncEdge.prev = v1.IncEdge;
 
-            Triangles.Add(t);
+            Faces.Add(t);
             Vertices.Add(v3);
         }
         // else if (v1Exists && v3Exists)
@@ -198,7 +212,7 @@ public class DCEL2D
             e33.prev = e11;
             e33.twin = e2;
 
-            Triangles.Add(t);
+            Faces.Add(t);
             Vertices.Add(v1);
             Vertices.Add(v2);
             Vertices.Add(v3);
