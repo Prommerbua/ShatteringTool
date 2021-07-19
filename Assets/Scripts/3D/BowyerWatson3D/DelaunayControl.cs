@@ -25,7 +25,7 @@ public class DelaunayControl : MonoBehaviour
     private Splitable _splitable;
     private List<Vector3> points;
 
-    public float CutPlaneSize = 100f;
+    public float CutPlaneSize;
 
     private Vector3 center;
 
@@ -36,6 +36,8 @@ public class DelaunayControl : MonoBehaviour
         _splitable = srcMesh.GetComponent<Splitable>();
         points = new List<Vector3>();
     }
+
+
 
 
     void CalculateVoronoiOnCollision(Vector3 contactPoint)
@@ -70,32 +72,27 @@ public class DelaunayControl : MonoBehaviour
             vertex.CalculateVoronoiCell();
             foreach (var plane in vertex.cell.faces)
             {
-                center = plane.plane.ClosestPointOnPlane(Vector3.zero);
-                // foreach (Vector3 v in plane.vertices)
-                // {
-                //     center += v;
-                // }
-                //
-                // center = center / plane.vertices.Count;
-
+                center = Vector3.zero;
+                foreach(Vector3 v in plane.vertices) { center += v; }
+                center /= plane.vertices.Count;
                 Vector3 normal = plane.plane.normal;
                 Vector3 fwd = Vector3.ProjectOnPlane(Vector3.forward, normal);
 
+
+
                 GameObject goCutPlane = new GameObject("CutPlane", typeof(BoxCollider), typeof(Rigidbody), typeof(SplitterSingleCut));
+
+                goCutPlane.GetComponent<Collider>().isTrigger = true;
                 Rigidbody bodyCutPlane = goCutPlane.GetComponent<Rigidbody>();
                 bodyCutPlane.useGravity = false;
                 bodyCutPlane.isKinematic = true;
 
                 Transform transformCutPlane = goCutPlane.transform;
-
-
                 transformCutPlane.position = center;
                 transformCutPlane.localScale = new Vector3(CutPlaneSize, .01f, CutPlaneSize);
                 transformCutPlane.up = normal;
                 float angleFwd = Vector3.Angle(transformCutPlane.forward, fwd);
                 transformCutPlane.RotateAround(center, normal, normal.y < 0f ? -angleFwd : angleFwd);
-
-
             }
         }
 
@@ -112,8 +109,13 @@ public class DelaunayControl : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        Destroy(other.gameObject);
-        CalculateVoronoiOnCollision(other.GetContact(0).point);
+        Debug.Log("Hit");
+        if (other.gameObject.name == "Projectile(Clone)")
+        {
+            Destroy(other.gameObject);
+            CalculateVoronoiOnCollision(other.GetContact(0).point);
+
+        }
     }
 
     public void drawTriangulation()
@@ -135,21 +137,33 @@ public class DelaunayControl : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        if (points != null)
-        {
-            foreach (var point in points)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(point, 0.05f);
-            }
-        }
-
-        if (center != default)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(center, 0.2f);
-        }
-    }
+    // private void OnDrawGizmos()
+    // {
+    //     if (points != null)
+    //     {
+    //         foreach (var point in points)
+    //         {
+    //             Gizmos.color = Color.red;
+    //             Gizmos.DrawSphere(point, 0.05f);
+    //         }
+    //     }
+    //
+    //     Gizmos.color = Color.red;
+    //     if (bw != null)
+    //     {
+    //         foreach (var vertex in bw.vertices)
+    //         {
+    //             foreach (var plane in vertex.cell.faces)
+    //             {
+    //                 foreach (var planeVertex in plane.vertices)
+    //                 {
+    //                     Gizmos.DrawSphere(planeVertex, 0.2f);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //
+    //     Gizmos.color = Color.blue;
+    //     Gizmos.DrawSphere(center, 0.2f);
+    // }
 }
