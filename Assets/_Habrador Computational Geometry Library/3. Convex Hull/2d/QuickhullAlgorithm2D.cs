@@ -377,7 +377,7 @@ namespace Habrador_Computational_Geometry
             {
                 MyVector2 pUnNormalize = normalizer.UnNormalize(p);
             
-                Debug.DrawLine(pUnNormalize.ToVector3(), Vector3.zero, Color.blue, 3f);
+                Debug.DrawLine(pUnNormalize.ToVector3(), UnityEngine.Vector3.zero, Color.blue, 3f);
             }
         }
     }

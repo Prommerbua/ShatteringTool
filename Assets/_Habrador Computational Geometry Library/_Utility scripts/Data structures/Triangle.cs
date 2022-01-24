@@ -8,11 +8,11 @@ namespace Habrador_Computational_Geometry
     public struct Triangle3
     {
         //Corners
-        public MyVector3 p1;
-        public MyVector3 p2;
-        public MyVector3 p3;
+        public Vector3 p1;
+        public Vector3 p2;
+        public Vector3 p3;
 
-        public Triangle3(MyVector3 p1, MyVector3 p2, MyVector3 p3)
+        public Triangle3(Vector3 p1, Vector3 p2, Vector3 p3)
         {
             this.p1 = p1;
             this.p2 = p2;

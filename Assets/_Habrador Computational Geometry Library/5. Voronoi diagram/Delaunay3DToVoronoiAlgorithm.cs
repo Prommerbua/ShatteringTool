@@ -15,17 +15,17 @@ namespace Habrador_Computational_Geometry
 
 
             //Step 1. Generate a center of circle for each triangle because this process is slow in 3d space
-            Dictionary<HalfEdgeFace3, MyVector3> circleCenterLookup = new Dictionary<HalfEdgeFace3, MyVector3>();
+            Dictionary<HalfEdgeFace3, Vector3> circleCenterLookup = new Dictionary<HalfEdgeFace3, Vector3>();
 
             HashSet<HalfEdgeFace3> delaunayTriangles = delaunayTriangulation.faces;
 
             foreach (HalfEdgeFace3 triangle in delaunayTriangles)
             {
-                MyVector3 p1 = triangle.edge.v.position;
-                MyVector3 p2 = triangle.edge.nextEdge.v.position;
-                MyVector3 p3 = triangle.edge.nextEdge.nextEdge.v.position;
+                Vector3 p1 = triangle.edge.v.position;
+                Vector3 p2 = triangle.edge.nextEdge.v.position;
+                Vector3 p3 = triangle.edge.nextEdge.nextEdge.v.position;
 
-                MyVector3 circleCenter = _Geometry.CalculateCircleCenter(p1, p2, p3);
+                Vector3 circleCenter = _Geometry.CalculateCircleCenter(p1, p2, p3);
 
                 //https://www.redblobgames.com/x/1842-delaunay-voronoi-sphere/ suggested circleCenter should be moved to get a better surface
                 //But it generates a bad result
@@ -44,7 +44,7 @@ namespace Habrador_Computational_Geometry
 
             //In the half-edge data structure we have multiple vertices at the same position, 
             //so we have to track which vertex positions have been added
-            HashSet<MyVector3> addedSites = new HashSet<MyVector3>();
+            HashSet<Vector3> addedSites = new HashSet<Vector3>();
 
 
             foreach (HalfEdgeVertex3 v in delaunayVertices)
@@ -78,9 +78,9 @@ namespace Habrador_Computational_Geometry
 
                     HalfEdgeFace3 thisTriangle = currentEdge.face;
 
-                    MyVector3 oppositeCircleCenter = circleCenterLookup[oppositeTriangle];
+                    Vector3 oppositeCircleCenter = circleCenterLookup[oppositeTriangle];
 
-                    MyVector3 thisCircleCenter = circleCenterLookup[thisTriangle];
+                    Vector3 thisCircleCenter = circleCenterLookup[thisTriangle];
 
                     VoronoiEdge3 edge = new VoronoiEdge3(oppositeCircleCenter, thisCircleCenter, v.position);
 

@@ -30,10 +30,10 @@ namespace Habrador_Computational_Geometry
             //DisplayMeshProfile(profile, testTrans, profileScale);
 
             //Vertices
-            List<Vector3> vertices = new List<Vector3>();
+            List<UnityEngine.Vector3> vertices = new List<UnityEngine.Vector3>();
 
             //Normals
-            List<Vector3> normals = new List<Vector3>();
+            List<UnityEngine.Vector3> normals = new List<UnityEngine.Vector3>();
 
             for (int step = 0; step < transforms.Count; step++)
             {
@@ -43,9 +43,9 @@ namespace Habrador_Computational_Geometry
                 {
                     MyVector2 localPos2d = profile.vertices[i].point;
 
-                    MyVector3 localPos = new MyVector3(localPos2d.x, localPos2d.y, 0f);
+                    Vector3 localPos = new Vector3(localPos2d.x, localPos2d.y, 0f);
 
-                    MyVector3 pos = thisTransform.LocalToWorld_Pos(localPos * profileScale);
+                    Vector3 pos = thisTransform.LocalToWorld_Pos(localPos * profileScale);
 
                     vertices.Add(pos.ToVector3());
 
@@ -53,9 +53,9 @@ namespace Habrador_Computational_Geometry
                     //Normals
                     MyVector2 localNormal2d = profile.vertices[i].normal;
 
-                    MyVector3 localNormal = new MyVector3(localNormal2d.x, localNormal2d.y, 0f);
+                    Vector3 localNormal = new Vector3(localNormal2d.x, localNormal2d.y, 0f);
 
-                    MyVector3 normal = thisTransform.LocalToWorld_Dir(localNormal);
+                    Vector3 normal = thisTransform.LocalToWorld_Dir(localNormal);
 
                     normals.Add(normal.ToVector3());
                 }

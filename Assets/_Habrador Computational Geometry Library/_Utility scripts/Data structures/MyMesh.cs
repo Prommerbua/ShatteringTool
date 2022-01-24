@@ -8,8 +8,8 @@ namespace Habrador_Computational_Geometry
     //Similar to Unity's mesh - known as face-vertex data structure 
     public class MyMesh
     {
-        public List<MyVector3> vertices;
-        public List<MyVector3> normals;
+        public List<Vector3> vertices;
+        public List<Vector3> normals;
         public List<int> triangles;
 
         //Cant be name because then we get the name of the game object
@@ -29,8 +29,8 @@ namespace Habrador_Computational_Geometry
         {
             this.meshName = meshName;
         
-            vertices = new List<MyVector3>();
-            normals = new List<MyVector3>();
+            vertices = new List<Vector3>();
+            normals = new List<Vector3>();
             triangles = new List<int>();
         }
 
@@ -39,8 +39,8 @@ namespace Habrador_Computational_Geometry
         public MyMesh(Mesh mesh_Unity)
         {
             //Standardize data
-            Vector3[] vertices_Unity = mesh_Unity.vertices;
-            Vector3[] normals_Unity = mesh_Unity.normals;
+            UnityEngine.Vector3[] vertices_Unity = mesh_Unity.vertices;
+            UnityEngine.Vector3[] normals_Unity = mesh_Unity.normals;
 
             //Vector3 -> MyVector3 
             this.vertices = vertices_Unity.Select(x => x.ToMyVector3()).ToList();
@@ -75,12 +75,12 @@ namespace Habrador_Computational_Geometry
             {
                 for (int i = 0; i < vertices.Count; i++)
                 {
-                    MyVector3 thisPos = vertices[i];
+                    Vector3 thisPos = vertices[i];
                    
                     if (thisPos.Equals(v.position))
                     {
                         //Here we have to compare both position and normal or we can't get hard edges in combination with soft edges
-                        MyVector3 thisNormal = normals[i];
+                        Vector3 thisNormal = normals[i];
 
                         if (meshStyle == MeshStyle.HardAndSoftEdges && thisNormal.Equals(v.normal))
                         {
@@ -158,7 +158,7 @@ namespace Habrador_Computational_Geometry
             Mesh mesh = new Mesh();
 
             //MyVector3 to Vector3
-            Vector3[] vertices_Unity = vertices.Select(x => x.ToVector3()).ToArray();
+            UnityEngine.Vector3[] vertices_Unity = vertices.Select(x => x.ToVector3()).ToArray();
           
             mesh.vertices = vertices_Unity;
 
@@ -172,7 +172,7 @@ namespace Habrador_Computational_Geometry
             else
             {
                 //MyVector3 to Vector3
-                Vector3[] normals_Unity = normals.Select(x => x.ToVector3()).ToArray();
+                UnityEngine.Vector3[] normals_Unity = normals.Select(x => x.ToVector3()).ToArray();
 
                 mesh.normals = normals_Unity;
             }

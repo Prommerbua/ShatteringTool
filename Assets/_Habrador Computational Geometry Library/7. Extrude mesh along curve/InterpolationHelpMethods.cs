@@ -14,10 +14,10 @@ namespace Habrador_Computational_Geometry
         //Steps is the number of sections we are going to split the curve in
         //So the number of interpolated values are steps + 1
         //tEnd is where we want to stop measuring if we dont want to split the entire curve, so tEnd is maximum of 1
-        public static List<MyVector3> SplitCurve(_Curve curve, int steps, float tEnd)
+        public static List<Vector3> SplitCurve(_Curve curve, int steps, float tEnd)
         {
             //Store the interpolated values so we later can display them
-            List<MyVector3> interpolatedPositions = new List<MyVector3>();
+            List<Vector3> interpolatedPositions = new List<Vector3>();
 
             //Loop between 0 and tStop in steps. If tStop is 1 we loop through the entire curve
             //1 step is minimum, so if steps is 5 then the line will be cut in 5 sections
@@ -30,7 +30,7 @@ namespace Habrador_Computational_Geometry
             {
                 //Debug.Log(t);
 
-                MyVector3 interpolatedValue = curve.GetPosition(t);
+                Vector3 interpolatedValue = curve.GetPosition(t);
 
                 interpolatedPositions.Add(interpolatedValue);
 
@@ -52,14 +52,14 @@ namespace Habrador_Computational_Geometry
         public static float GetLength_Naive(_Curve curve, int steps, float tEnd)
         {
             //Split the ruve into positions with some steps resolution
-            List<MyVector3> CurvePoints = SplitCurve(curve, steps, tEnd);
+            List<Vector3> CurvePoints = SplitCurve(curve, steps, tEnd);
 
             //Calculate the length by measuring the length of each step
             float length = 0f;
 
             for (int i = 1; i < CurvePoints.Count; i++)
             {
-                float thisStepLength = MyVector3.Distance(CurvePoints[i - 1], CurvePoints[i]);
+                float thisStepLength = Vector3.Distance(CurvePoints[i - 1], CurvePoints[i]);
 
                 length += thisStepLength;
             }
@@ -354,7 +354,7 @@ namespace Habrador_Computational_Geometry
         public static List<float> GetAccumulatedDistances(_Curve curve, int steps = 20)
         {
             //Step 1. Find positions on the curve by using the inaccurate t-value
-            List<MyVector3> positionsOnCurve = SplitCurve(curve, steps, tEnd: 1f);
+            List<Vector3> positionsOnCurve = SplitCurve(curve, steps, tEnd: 1f);
 
 
             //Step 2. Calculate the cumulative distances along the curve for each position along the curve 
@@ -367,7 +367,7 @@ namespace Habrador_Computational_Geometry
 
             for (int i = 1; i < positionsOnCurve.Count; i++)
             {
-                totalDistance += MyVector3.Distance(positionsOnCurve[i], positionsOnCurve[i - 1]);
+                totalDistance += Vector3.Distance(positionsOnCurve[i], positionsOnCurve[i - 1]);
 
                 accumulatedDistances.Add(totalDistance);
             }
@@ -388,14 +388,14 @@ namespace Habrador_Computational_Geometry
             //Should be around this number
             float derivativeStepSize = 0.0001f;
 
-            MyVector3 valueMinus = curve.GetPosition(t - derivativeStepSize);
-            MyVector3 valuePlus = curve.GetPosition(t + derivativeStepSize);
+            Vector3 valueMinus = curve.GetPosition(t - derivativeStepSize);
+            Vector3 valuePlus = curve.GetPosition(t + derivativeStepSize);
 
             //Have to multiply by two because we are taking a step in each direction
-            MyVector3 derivativeVector = (valuePlus - valueMinus) * (1f / (derivativeStepSize * 2f));
+            Vector3 derivativeVector = (valuePlus - valueMinus) * (1f / (derivativeStepSize * 2f));
 
 
-            float derivative = MyVector3.Magnitude(derivativeVector);
+            float derivative = Vector3.Magnitude(derivativeVector);
 
 
             return derivative;

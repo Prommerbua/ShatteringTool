@@ -7,12 +7,12 @@ namespace Habrador_Computational_Geometry
     //3D
     public class Plane3
     {
-        public MyVector3 pos;
+        public Vector3 pos;
 
-        public MyVector3 normal;
+        public Vector3 normal;
 
 
-        public Plane3(MyVector3 pos, MyVector3 normal)
+        public Plane3(Vector3 pos, Vector3 normal)
         {
             this.pos = pos;
 
@@ -21,11 +21,11 @@ namespace Habrador_Computational_Geometry
 
 
         //p1-p2-p3 should be ordered clock-wise
-        public Plane3(MyVector3 p1, MyVector3 p2, MyVector3 p3)
+        public Plane3(Vector3 p1, Vector3 p2, Vector3 p3)
         {
             this.pos = p1;
 
-            MyVector3 normal = _Geometry.CalculateTriangleNormal(p1, p2, p3);
+            Vector3 normal = _Geometry.CalculateTriangleNormal(p1, p2, p3);
 
             this.normal = normal;
         }
@@ -45,9 +45,9 @@ namespace Habrador_Computational_Geometry
 
         public Plane3 Plane3 => new Plane3(Position, Normal);
 
-        public MyVector3 Position => planeTrans.position.ToMyVector3();
+        public Vector3 Position => planeTrans.position.ToMyVector3();
 
-        public MyVector3 Normal => planeTrans.up.ToMyVector3();
+        public Vector3 Normal => planeTrans.up.ToMyVector3();
     }
 
 

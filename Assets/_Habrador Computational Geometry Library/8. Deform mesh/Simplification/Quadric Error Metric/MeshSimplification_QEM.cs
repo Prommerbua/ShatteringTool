@@ -43,7 +43,7 @@ namespace Habrador_Computational_Geometry
 
             //Put the result in a lookup dictionary
             //This assumes we have no floating point precision issues, so vertices at the same position have to be at the same position
-            Dictionary<MyVector3, Matrix4x4> qMatrices = new Dictionary<MyVector3, Matrix4x4>();
+            Dictionary<Vector3, Matrix4x4> qMatrices = new Dictionary<Vector3, Matrix4x4>();
 
             HashSet<HalfEdgeVertex3> vertices = halfEdgeMeshData.verts;
 
@@ -98,8 +98,8 @@ namespace Habrador_Computational_Geometry
 
             foreach (HalfEdge3 halfEdge in validPairs)
             {            
-                MyVector3 p1 = halfEdge.prevEdge.v.position;
-                MyVector3 p2 = halfEdge.v.position;
+                Vector3 p1 = halfEdge.prevEdge.v.position;
+                Vector3 p2 = halfEdge.v.position;
 
                 Matrix4x4 Q1 = qMatrices[p1];
                 Matrix4x4 Q2 = qMatrices[p2];
@@ -299,12 +299,12 @@ namespace Habrador_Computational_Geometry
             foreach (HalfEdge3 e in edgesPointingToVertex)
             {
                 //To calculate the Kp matric we need all vertices
-                MyVector3 p1 = e.v.position;
-                MyVector3 p2 = e.nextEdge.v.position;
-                MyVector3 p3 = e.nextEdge.nextEdge.v.position;
+                Vector3 p1 = e.v.position;
+                Vector3 p2 = e.nextEdge.v.position;
+                Vector3 p3 = e.nextEdge.nextEdge.v.position;
 
                 //...and a normal
-                MyVector3 normal = _Geometry.CalculateTriangleNormal(p1, p2, p3);
+                Vector3 normal = _Geometry.CalculateTriangleNormal(p1, p2, p3);
 
                 if (float.IsNaN(normal.x) || float.IsNaN(normal.y) || float.IsNaN(normal.z))
                 {

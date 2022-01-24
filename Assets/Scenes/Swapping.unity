@@ -346,11 +346,6 @@ MonoBehaviour:
   mesh: {fileID: 0}
   renderer: {fileID: 0}
   VoxelSize: 1
---- !u!4 &683778713 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6523600849766192767, guid: 46338d658ce35334385db0c383a5a672, type: 3}
-  m_PrefabInstance: {fileID: 2139216643}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1352930952
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -368,7 +363,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3945418031405980646, guid: 9f5599933530ce14e826c7a1ecc9e836, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.32
+      value: 0.803
       objectReference: {fileID: 0}
     - target: {fileID: 3945418031405980646, guid: 9f5599933530ce14e826c7a1ecc9e836, type: 3}
       propertyPath: m_LocalPosition.z
@@ -421,11 +416,6 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 3551732305835078350, guid: 9f5599933530ce14e826c7a1ecc9e836, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9f5599933530ce14e826c7a1ecc9e836, type: 3}
---- !u!4 &1657012444 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6523600848698310748, guid: 46338d658ce35334385db0c383a5a672, type: 3}
-  m_PrefabInstance: {fileID: 2139216643}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2022175120
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,14 +447,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e30682c720b6694681a0eb8b7252ad3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 3
-  mouseX: 0
-  mouseY: 0
-  maxUpAngle: 80
-  maxDownAngle: -80
-  player: {fileID: 1657012444}
-  CameraPosition: {fileID: 683778713}
-  rotZ: 0
 --- !u!81 &2022175122
 AudioListener:
   m_ObjectHideFlags: 0

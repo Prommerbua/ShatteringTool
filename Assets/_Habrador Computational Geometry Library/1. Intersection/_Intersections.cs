@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Habrador_Computational_Geometry
 {
-    //Help enum, to make it easier to deal with three cases: intersecting inside, intersecting on edge, not intersecting 
+    //Help enum, to make it easier to deal with three cases: intersecting inside, intersecting on edge, not intersecting
     //If we have two cases we can just return a bool
     public enum IntersectionCases
     {
@@ -69,7 +69,7 @@ namespace Habrador_Computational_Geometry
 
 
         //Whats the coordinate of the intersection point between two lines in 2d space if we know they are intersecting
-        //http://thirdpartyninjas.com/blog/2008/10/07/line-segment-intersection/        
+        //http://thirdpartyninjas.com/blog/2008/10/07/line-segment-intersection/
         public static MyVector2 GetLineLineIntersectionPoint(Edge2 a, Edge2 b)
         {
             float denominator = (b.p2.y - b.p1.y) * (a.p2.x - a.p1.x) - (b.p2.x - b.p1.x) * (a.p2.y - a.p1.y);
@@ -102,17 +102,31 @@ namespace Habrador_Computational_Geometry
 
             return intersectionPoint;
         }
-        
+
         //3d
-        private static MyVector3 GetIntersectionCoordinate(Plane3 plane, Ray3 ray)
+        private static Vector3 GetIntersectionCoordinate(Plane3 plane, Ray3 ray)
         {
-            float denominator = MyVector3.Dot(-plane.normal, ray.dir);
+            float denominator = Vector3.Dot(-plane.normal, ray.dir);
 
-            MyVector3 vecBetween = plane.pos - ray.origin;
+            Vector3 vecBetween = plane.pos - ray.origin;
 
-            float t = MyVector3.Dot(vecBetween, -plane.normal) / denominator;
+            float t = Vector3.Dot(vecBetween, -plane.normal) / denominator;
 
-            MyVector3 intersectionPoint = ray.origin + ray.dir * t;
+            Vector3 intersectionPoint = ray.origin + ray.dir * t;
+
+            return intersectionPoint;
+        }
+
+        //Get the coordinate if we know a ray-plane is intersecting
+        public static UnityEngine.Vector3 GetRayPlaneIntersectionCoordinate(UnityEngine.Vector3 planePos, UnityEngine.Vector3 planeNormal, UnityEngine.Vector3 rayStart, UnityEngine.Vector3 rayDir)
+        {
+            float denominator = UnityEngine.Vector3.Dot(-planeNormal, rayDir);
+
+            UnityEngine.Vector3 vecBetween = planePos - rayStart;
+
+            float t = UnityEngine.Vector3.Dot(vecBetween, -planeNormal) / denominator;
+
+            UnityEngine.Vector3 intersectionPoint = rayStart + rayDir * t;
 
             return intersectionPoint;
         }
@@ -221,13 +235,13 @@ namespace Habrador_Computational_Geometry
         }
 
         //3d
-        public static MyVector3 GetLinePlaneIntersectionPoint(Plane3 plane, Edge3 line)
+        public static Vector3 GetLinePlaneIntersectionPoint(Plane3 plane, Edge3 line)
         {
-            MyVector3 lineDir = MyVector3.Normalize(line.p1 - line.p2);
+            Vector3 lineDir = Vector3.Normalize(line.p1 - line.p2);
 
             Ray3 ray = new Ray3(line.p1, lineDir);
 
-            MyVector3 intersectionPoint = GetIntersectionCoordinate(plane, ray);
+            Vector3 intersectionPoint = GetIntersectionCoordinate(plane, ray);
 
             return intersectionPoint;
         }
@@ -378,7 +392,7 @@ namespace Habrador_Computational_Geometry
         //
         // Are two Axis-aligned-bounding-box (boxes are here rectangles) intersecting?
         //
-        
+
         //2d
         public static bool AABB_AABB(AABB2 r1, AABB2 r2)
         {
@@ -425,7 +439,7 @@ namespace Habrador_Computational_Geometry
 
             //The distance sqr from the point to the circle center
             float distPointCenterSqr = MyVector2.SqrDistance(testPoint, circleCenter);
-            
+
             //Add/remove a small value becuse we will never be exactly on the edge because of floating point precision issues
             //Mutiply epsilon by two because we are using sqr root???
             if (distPointCenterSqr < radiusSqr - MathUtility.EPSILON * 2f)
@@ -515,7 +529,7 @@ namespace Habrador_Computational_Geometry
         //
 
         //If the point is on the hull it's "inside"
-        public static bool PointWithinConvexHull(MyVector3 point, HalfEdgeData3 convexHull)
+        public static bool PointWithinConvexHull(Vector3 point, HalfEdgeData3 convexHull)
         {
             bool isInside = true;
 
@@ -557,7 +571,7 @@ namespace Habrador_Computational_Geometry
             //Step 0. AABB intersection which may speed up the algorithm if the triangles are far apart
             if (do_AABB_test)
             {
-                //Rectangle that covers t1 
+                //Rectangle that covers t1
                 AABB2 r1 = new AABB2(t1.MinX(), t1.MaxX(), t1.MinY(), t1.MaxY());
 
                 //Rectangle that covers t2

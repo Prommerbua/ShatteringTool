@@ -7,11 +7,11 @@ namespace Habrador_Computational_Geometry
     //Generate a Transform (position and orientation) suitable for curves like Bezier in 3d space
     public class InterpolationTransform
     {
-        public MyVector3 position;
+        public Vector3 position;
         
         public MyQuaternion orientation;
 
-        public InterpolationTransform(MyVector3 position, MyQuaternion orientation)
+        public InterpolationTransform(Vector3 position, MyQuaternion orientation)
         {
             this.position = position;
             this.orientation = orientation;
@@ -43,13 +43,13 @@ namespace Habrador_Computational_Geometry
 
         //Use ref vector to know which direction is up
         //Is not going to work if we have loops, but should work if you make "2d" roads like in cities skylines so no roller coasters
-        public static MyQuaternion GetOrientation_UpRef(MyVector3 tangent, MyVector3 upRef)
+        public static MyQuaternion GetOrientation_UpRef(Vector3 tangent, Vector3 upRef)
         {
-            tangent = MyVector3.Normalize(tangent);
+            tangent = Vector3.Normalize(tangent);
 
-            MyVector3 biNormal = MyVector3.Normalize(MyVector3.Cross(upRef, tangent));
+            Vector3 biNormal = Vector3.Normalize(Vector3.Cross(upRef, tangent));
 
-            MyVector3 normal = MyVector3.Normalize(MyVector3.Cross(tangent, biNormal));
+            Vector3 normal = Vector3.Normalize(Vector3.Cross(tangent, biNormal));
 
             MyQuaternion orientation = new MyQuaternion(tangent, normal);
 
@@ -57,13 +57,13 @@ namespace Habrador_Computational_Geometry
         }
 
 
-        public static InterpolationTransform GetTransform_UpRef(_Curve curve, float t, MyVector3 upRef)
+        public static InterpolationTransform GetTransform_UpRef(_Curve curve, float t, Vector3 upRef)
         {
             //Position on the curve at point t
-            MyVector3 pos = curve.GetPosition(t);
+            Vector3 pos = curve.GetPosition(t);
 
             //Forward direction (tangent) on the curve at point t
-            MyVector3 forwardDir = curve.GetTangent(t);
+            Vector3 forwardDir = curve.GetTangent(t);
 
             //A simple way to get the other directions is to use LookRotation with just forward dir as parameter
             //Then the up direction will always be the world up direction, and it calculates the right direction 
@@ -79,7 +79,7 @@ namespace Habrador_Computational_Geometry
         }
 
 
-        public static List<InterpolationTransform> GetTransforms_UpRef(_Curve curve, List<float> tValues, MyVector3 upRef)
+        public static List<InterpolationTransform> GetTransforms_UpRef(_Curve curve, List<float> tValues, Vector3 upRef)
         {
             List<InterpolationTransform> orientations = new List<InterpolationTransform>();
 
@@ -100,16 +100,16 @@ namespace Habrador_Computational_Geometry
         //
         
         public static InterpolationTransform GetTransform_InterpolateBetweenUpVectors(
-            _Curve curve, float t, MyVector3 upRefStart, MyVector3 upRefEnd)
+            _Curve curve, float t, Vector3 upRefStart, Vector3 upRefEnd)
         {
             //Position on the curve at point t
-            MyVector3 pos = curve.GetPosition(t);
+            Vector3 pos = curve.GetPosition(t);
 
             //Forward direction (tangent) on the curve at point t
-            MyVector3 forwardDir = curve.GetTangent(t);
+            Vector3 forwardDir = curve.GetTangent(t);
 
             //Interpolate between the start and end up vector to get an up vector at a t position
-            MyVector3 interpolatedUpDir = MyVector3.Normalize(BezierLinear.GetPosition(upRefStart, upRefEnd, t));
+            Vector3 interpolatedUpDir = Vector3.Normalize(BezierLinear.GetPosition(upRefStart, upRefEnd, t));
 
             MyQuaternion orientation = InterpolationTransform.GetOrientation_UpRef(forwardDir, interpolatedUpDir);
 
@@ -120,7 +120,7 @@ namespace Habrador_Computational_Geometry
 
 
         public static List<InterpolationTransform> GetTransforms_InterpolateBetweenUpVectors(
-            _Curve curve, List<float> tValues, MyVector3 upRefStart, MyVector3 upRefEnd)
+            _Curve curve, List<float> tValues, Vector3 upRefStart, Vector3 upRefEnd)
         {
             List<InterpolationTransform> transforms = new List<InterpolationTransform>();
 
@@ -142,18 +142,18 @@ namespace Habrador_Computational_Geometry
 
         //Use the tagent we have and a tangent next to it
         //Works in many cases (but sometimes the frame may flip because of changes in the second derivative) 
-        public static MyQuaternion GetOrientation_FrenetNormal(MyVector3 tangent, MyVector3 secondDerivativeVec)
+        public static MyQuaternion GetOrientation_FrenetNormal(Vector3 tangent, Vector3 secondDerivativeVec)
         {
-            MyVector3 a = MyVector3.Normalize(tangent);
+            Vector3 a = Vector3.Normalize(tangent);
 
             //What a next point's tangent would be if the curve stopped changing at our point and just had the same derivative and second derivative from that point on
-            MyVector3 b = MyVector3.Normalize(a + secondDerivativeVec);
+            Vector3 b = Vector3.Normalize(a + secondDerivativeVec);
 
             //A vector that we use as the "axis of rotation" for turning the tangent a quarter circle to get the normal
-            MyVector3 r = MyVector3.Normalize(MyVector3.Cross(a, b));
+            Vector3 r = Vector3.Normalize(Vector3.Cross(a, b));
 
             //The normal vector should be perpendicular to the plane that the tangent and the axis of rotation lie in
-            MyVector3 normal = MyVector3.Normalize(MyVector3.Cross(r, a));
+            Vector3 normal = Vector3.Normalize(Vector3.Cross(r, a));
 
             MyQuaternion orientation = new MyQuaternion(tangent, normal);
 
@@ -164,12 +164,12 @@ namespace Habrador_Computational_Geometry
         public static InterpolationTransform GetTransform_FrenetNormal(_Curve curve, float t)
         {
             //Position on the curve at point t
-            MyVector3 pos = curve.GetPosition(t);
+            Vector3 pos = curve.GetPosition(t);
 
             //Forward direction (tangent) on the curve at point t
-            MyVector3 forwardDir = curve.GetTangent(t);
+            Vector3 forwardDir = curve.GetTangent(t);
 
-            MyVector3 secondDerivativeVec = curve.GetSecondDerivativeVec(t);
+            Vector3 secondDerivativeVec = curve.GetSecondDerivativeVec(t);
 
             MyQuaternion orientation = InterpolationTransform.GetOrientation_FrenetNormal(forwardDir, secondDerivativeVec);
 
@@ -203,7 +203,7 @@ namespace Habrador_Computational_Geometry
         //Gets its stability by incrementally rotating a coordinate system (= frame) as it is translate along the curve
         //Has to be computed for the entire curve because we need the previous frame (previousTransform) belonging to a point before this point
         //Is initalized by using "Fixed Up" or "Frenet Normal"
-        public static MyQuaternion GetOrientation_RotationFrame(MyVector3 position, MyVector3 tangent, InterpolationTransform previousTransform)
+        public static MyQuaternion GetOrientation_RotationFrame(Vector3 position, Vector3 tangent, InterpolationTransform previousTransform)
         {
             /*
             //This version is from https://pomax.github.io/bezierinfo/#pointvectors3d
@@ -236,14 +236,14 @@ namespace Habrador_Computational_Geometry
             //They generate the same result and this one is easier to understand
 
             //The two tangents
-            MyVector3 T1 = previousTransform.Forward;
-            MyVector3 T2 = tangent;
+            Vector3 T1 = previousTransform.Forward;
+            Vector3 T2 = tangent;
 
             //You move T1 to the new position, so A is a vector going from the new position
-            MyVector3 A = MyVector3.Cross(T1, T2);
+            Vector3 A = Vector3.Cross(T1, T2);
 
             //This is the angle between T1 and T2
-            float alpha = Mathf.Acos(MyVector3.Dot(T1, T2) / (MyVector3.Magnitude(T1) * MyVector3.Magnitude(T2)));
+            float alpha = Mathf.Acos(Vector3.Dot(T1, T2) / (Vector3.Magnitude(T1) * Vector3.Magnitude(T2)));
 
             //Now rotate the previous frame around axis A with angle alpha
             MyQuaternion F1 = previousTransform.orientation;
@@ -264,7 +264,7 @@ namespace Habrador_Computational_Geometry
         //}
 
 
-        public static List<InterpolationTransform> GetTransforms_RotationMinimisingFrame(_Curve curve, List<float> tValues, MyVector3 upRef)
+        public static List<InterpolationTransform> GetTransforms_RotationMinimisingFrame(_Curve curve, List<float> tValues, Vector3 upRef)
         {
             List<InterpolationTransform> transforms = new List<InterpolationTransform>();
 
@@ -273,10 +273,10 @@ namespace Habrador_Computational_Geometry
                 float t = tValues[i];
 
                 //Position on the curve at point t
-                MyVector3 position = curve.GetPosition(t);
+                Vector3 position = curve.GetPosition(t);
 
                 //Forward direction (tangent) on the curve at point t
-                MyVector3 tangent = curve.GetTangent(t);
+                Vector3 tangent = curve.GetTangent(t);
 
                 //At first pos we dont have a previous transform
                 if (i == 0)
@@ -310,9 +310,9 @@ namespace Habrador_Computational_Geometry
         // Get directions from orientation
         //
 
-        public MyVector3 Forward => orientation.Forward;
-        public MyVector3 Right   => orientation.Right;
-        public MyVector3 Up      => orientation.Up;
+        public Vector3 Forward => orientation.Forward;
+        public Vector3 Right   => orientation.Right;
+        public Vector3 Up      => orientation.Up;
 
 
 
@@ -323,17 +323,17 @@ namespace Habrador_Computational_Geometry
         //Transform a position from local to world
         //If input is MyVector3.Right * 2f then we should get a point in world space on the curve 
         //at this position moved along the local x-axis 2m
-        public MyVector3 LocalToWorld_Pos(MyVector3 localPos)
+        public Vector3 LocalToWorld_Pos(Vector3 localPos)
         {
-            MyVector3 worldPos = position + MyQuaternion.RotateVector(orientation, localPos);
+            Vector3 worldPos = position + MyQuaternion.RotateVector(orientation, localPos);
 
             return worldPos;
         }
 
         //Transform a direction from local to world
-        public MyVector3 LocalToWorld_Dir(MyVector3 localDir)
+        public Vector3 LocalToWorld_Dir(Vector3 localDir)
         {
-            MyVector3 worldDir = MyQuaternion.RotateVector(orientation, localDir);
+            Vector3 worldDir = MyQuaternion.RotateVector(orientation, localDir);
 
             return worldDir;
         }

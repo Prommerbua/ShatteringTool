@@ -71,23 +71,23 @@ namespace Habrador_Computational_Geometry
         // Calculate the center of circle in 3d space given three coordinates
         //
         //From https://gamedev.stackexchange.com/questions/60630/how-do-i-find-the-circumcenter-of-a-triangle-in-3d
-        public static MyVector3 CalculateCircleCenter(MyVector3 a, MyVector3 b, MyVector3 c)
+        public static Vector3 CalculateCircleCenter(Vector3 a, Vector3 b, Vector3 c)
         {
-            MyVector3 ac = c - a;
-            MyVector3 ab = b - a;
-            MyVector3 abXac = MyVector3.Cross(ab, ac);
+            Vector3 ac = c - a;
+            Vector3 ab = b - a;
+            Vector3 abXac = Vector3.Cross(ab, ac);
 
             //This is the vector from a to the circumsphere center
-            MyVector3 toCircumsphereCenter = MyVector3.Cross(abXac, ab) * Mathf.Pow(MyVector3.Magnitude(ac), 2f);
+            Vector3 toCircumsphereCenter = Vector3.Cross(abXac, ab) * Mathf.Pow(Vector3.Magnitude(ac), 2f);
 
-            toCircumsphereCenter += MyVector3.Cross(ac, abXac) * Mathf.Pow(MyVector3.Magnitude(ab), 2f);
+            toCircumsphereCenter += Vector3.Cross(ac, abXac) * Mathf.Pow(Vector3.Magnitude(ab), 2f);
 
-            toCircumsphereCenter *= (1f / (2f * Mathf.Pow(MyVector3.Magnitude(abXac), 2f)));
+            toCircumsphereCenter *= (1f / (2f * Mathf.Pow(Vector3.Magnitude(abXac), 2f)));
             
-            float circumsphereRadius = MyVector3.Magnitude(toCircumsphereCenter);
+            float circumsphereRadius = Vector3.Magnitude(toCircumsphereCenter);
 
             //The circumsphere center becomes
-            MyVector3 ccs = a + toCircumsphereCenter;
+            Vector3 ccs = a + toCircumsphereCenter;
 
             return ccs;
         }
@@ -97,9 +97,9 @@ namespace Habrador_Computational_Geometry
         //
         // Calculate the center of a triangle in 3d space
         //
-        public static MyVector3 CalculateTriangleCenter(MyVector3 p1, MyVector3 p2, MyVector3 p3)
+        public static Vector3 CalculateTriangleCenter(Vector3 p1, Vector3 p2, Vector3 p3)
         {
-            MyVector3 center = (p1 + p2 + p3) * (1f / 3f);
+            Vector3 center = (p1 + p2 + p3) * (1f / 3f);
 
             return center;
         }
@@ -200,9 +200,9 @@ namespace Habrador_Computational_Geometry
         //- Negative means it's inside
 
         //3d
-        public static float GetSignedDistanceFromPointToPlane(MyVector3 pointPos, Plane3 plane)
+        public static float GetSignedDistanceFromPointToPlane(Vector3 pointPos, Plane3 plane)
         {
-            float distance = MyVector3.Dot(plane.normal, pointPos - plane.pos);
+            float distance = Vector3.Dot(plane.normal, pointPos - plane.pos);
 
             return distance;
         }
@@ -220,7 +220,7 @@ namespace Habrador_Computational_Geometry
 
         //3d
         //Outside means in the planes normal direction
-        public static bool IsPointOutsidePlane(MyVector3 pointPos, Plane3 plane) 
+        public static bool IsPointOutsidePlane(Vector3 pointPos, Plane3 plane) 
         {
             float distance = GetSignedDistanceFromPointToPlane(pointPos, plane);
 
@@ -238,7 +238,7 @@ namespace Habrador_Computational_Geometry
         }
 
         //3d
-        public static OutsideOnInside IsPoint_Outside_On_Inside_Plane(MyVector3 pointPos, Plane3 plane)
+        public static OutsideOnInside IsPoint_Outside_On_Inside_Plane(Vector3 pointPos, Plane3 plane)
         {
             float distance = GetSignedDistanceFromPointToPlane(pointPos, plane);
 
@@ -395,18 +395,18 @@ namespace Habrador_Computational_Geometry
 
         //3d
         //Same math as in 2d case
-        public static MyVector3 GetClosestPointOnLine(Edge3 e, MyVector3 p, bool withinSegment)
+        public static Vector3 GetClosestPointOnLine(Edge3 e, Vector3 p, bool withinSegment)
         {
-            MyVector3 a = e.p1;
-            MyVector3 b = e.p2;
+            Vector3 a = e.p1;
+            Vector3 b = e.p2;
 
             //Assume the line goes from a to b
-            MyVector3 ab = b - a;
+            Vector3 ab = b - a;
             //Vector from start of the line to the point outside of line
-            MyVector3 ap = p - a;
+            Vector3 ap = p - a;
 
             //The normalized "distance" from a to the closest point, so [0,1] if we are within the line segment
-            float distance = MyVector3.Dot(ap, ab) / MyVector3.SqrMagnitude(ab);
+            float distance = Vector3.Dot(ap, ab) / Vector3.SqrMagnitude(ab);
 
 
             ///This point may not be on the line segment, if so return one of the end points
@@ -507,13 +507,13 @@ namespace Habrador_Computational_Geometry
         //
         // Calculate the normal of a clock-wise oriented triangle in 3d space
         //
-        public static MyVector3 CalculateTriangleNormal(MyVector3 p1, MyVector3 p2, MyVector3 p3, bool shouldNormalize = true)
+        public static Vector3 CalculateTriangleNormal(Vector3 p1, Vector3 p2, Vector3 p3, bool shouldNormalize = true)
         {
-            MyVector3 normal = MyVector3.Cross(p3 - p2, p1 - p2);
+            Vector3 normal = Vector3.Cross(p3 - p2, p1 - p2);
 
             if (shouldNormalize)
             {
-                normal = MyVector3.Normalize(normal);
+                normal = Vector3.Normalize(normal);
             }
 
             return normal;
@@ -525,11 +525,11 @@ namespace Habrador_Computational_Geometry
         // Calculate the area of a triangle in 3d space
         //
         //https://math.stackexchange.com/questions/128991/how-to-calculate-the-area-of-a-3d-triangle
-        public static float CalculateTriangleArea(MyVector3 p1, MyVector3 p2, MyVector3 p3)
+        public static float CalculateTriangleArea(Vector3 p1, Vector3 p2, Vector3 p3)
         {
-            MyVector3 normal = CalculateTriangleNormal(p1, p2, p3, shouldNormalize: false);
+            Vector3 normal = CalculateTriangleNormal(p1, p2, p3, shouldNormalize: false);
 
-            float parallelogramArea = MyVector3.Magnitude(normal);
+            float parallelogramArea = Vector3.Magnitude(normal);
 
             float triangleArea = parallelogramArea * 0.5f;
 

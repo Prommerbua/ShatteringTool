@@ -173,7 +173,7 @@ namespace Habrador_Computational_Geometry
         private AABB3 boundingBox;
 
 
-        public Normalizer3(List<MyVector3> points)
+        public Normalizer3(List<Vector3> points)
         {
             this.boundingBox = new AABB3(points);
 
@@ -197,24 +197,24 @@ namespace Habrador_Computational_Geometry
         //
 
         //MyVector3
-        public MyVector3 Normalize(MyVector3 point)
+        public Vector3 Normalize(Vector3 point)
         {
             float x = (point.x - boundingBox.min.x) / dMax;
             float y = (point.y - boundingBox.min.y) / dMax;
             float z = (point.z - boundingBox.min.z) / dMax;
 
-            MyVector3 pNormalized = new MyVector3(x, y, z);
+            Vector3 pNormalized = new Vector3(x, y, z);
 
             return pNormalized;
         }
 
 
         //List<MyVector3>
-        public List<MyVector3> Normalize(List<MyVector3> points)
+        public List<Vector3> Normalize(List<Vector3> points)
         {
-            List<MyVector3> normalizedPoints = new List<MyVector3>();
+            List<Vector3> normalizedPoints = new List<Vector3>();
 
-            foreach (MyVector3 p in points)
+            foreach (Vector3 p in points)
             {
                 normalizedPoints.Add(Normalize(p));
             }
@@ -224,11 +224,11 @@ namespace Habrador_Computational_Geometry
 
 
         //HashSet<MyVector3> 
-        public HashSet<MyVector3> Normalize(HashSet<MyVector3> points)
+        public HashSet<Vector3> Normalize(HashSet<Vector3> points)
         {
-            HashSet<MyVector3> normalizedPoints = new HashSet<MyVector3>();
+            HashSet<Vector3> normalizedPoints = new HashSet<Vector3>();
 
-            foreach (MyVector3 p in points)
+            foreach (Vector3 p in points)
             {
                 normalizedPoints.Add(Normalize(p));
             }
@@ -242,7 +242,7 @@ namespace Habrador_Computational_Geometry
         {
             foreach (HalfEdgeVertex3 v in data.verts)
             {
-                MyVector3 vNormalized = Normalize(v.position);
+                Vector3 vNormalized = Normalize(v.position);
 
                 v.position = vNormalized;
             }
@@ -282,26 +282,26 @@ namespace Habrador_Computational_Geometry
         //
 
         //MyVector3
-        public MyVector3 UnNormalize(MyVector3 point)
+        public Vector3 UnNormalize(Vector3 point)
         {
             float x = (point.x * dMax) + boundingBox.min.x;
             float y = (point.y * dMax) + boundingBox.min.y;
             float z = (point.z * dMax) + boundingBox.min.z;
 
-            MyVector3 pUnNormalized = new MyVector3(x, y, z);
+            Vector3 pUnNormalized = new Vector3(x, y, z);
 
             return pUnNormalized;
         }
 
 
         //List<MyVector3>
-        public List<MyVector3> UnNormalize(List<MyVector3> normalized)
+        public List<Vector3> UnNormalize(List<Vector3> normalized)
         {
-            List<MyVector3> unNormalized = new List<MyVector3>();
+            List<Vector3> unNormalized = new List<Vector3>();
 
-            foreach (MyVector3 p in normalized)
+            foreach (Vector3 p in normalized)
             {
-                MyVector3 pUnNormalized = UnNormalize(p);
+                Vector3 pUnNormalized = UnNormalize(p);
 
                 unNormalized.Add(pUnNormalized);
             }
@@ -317,9 +317,9 @@ namespace Habrador_Computational_Geometry
 
             foreach (Triangle3 t in normalized)
             {
-                MyVector3 p1 = UnNormalize(t.p1);
-                MyVector3 p2 = UnNormalize(t.p2);
-                MyVector3 p3 = UnNormalize(t.p3);
+                Vector3 p1 = UnNormalize(t.p1);
+                Vector3 p2 = UnNormalize(t.p2);
+                Vector3 p3 = UnNormalize(t.p3);
 
                 Triangle3 tUnNormalized = new Triangle3(p1, p2, p3);
 
@@ -335,7 +335,7 @@ namespace Habrador_Computational_Geometry
         {
             foreach (HalfEdgeVertex3 v in data.verts)
             {
-                MyVector3 vUnNormalized = UnNormalize(v.position);
+                Vector3 vUnNormalized = UnNormalize(v.position);
 
                 v.position = vUnNormalized;
             }
@@ -376,14 +376,14 @@ namespace Habrador_Computational_Geometry
 
             foreach (VoronoiCell3 cell in data)
             {
-                MyVector3 sitePosUnNormalized = UnNormalize(cell.sitePos);
+                Vector3 sitePosUnNormalized = UnNormalize(cell.sitePos);
 
                 VoronoiCell3 cellUnNormalized = new VoronoiCell3(sitePosUnNormalized);
 
                 foreach (VoronoiEdge3 e in cell.edges)
                 {
-                    MyVector3 p1UnNormalized = UnNormalize(e.p1);
-                    MyVector3 p2UnNormalized = UnNormalize(e.p2);
+                    Vector3 p1UnNormalized = UnNormalize(e.p1);
+                    Vector3 p2UnNormalized = UnNormalize(e.p2);
 
                     VoronoiEdge3 eUnNormalized = new VoronoiEdge3(p1UnNormalized, p2UnNormalized, sitePosUnNormalized);
 

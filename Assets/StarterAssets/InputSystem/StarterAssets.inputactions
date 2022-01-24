@@ -31,16 +31,16 @@
                 },
                 {
                     "name": "Sprint",
-                    "type": "PassThrough",
+                    "type": "Button",
                     "id": "980e881e-182c-404c-8cbf-3d09fdb48fef",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
                 },
                 {
                     "name": "Shoot",
-                    "type": "Value",
-                    "id": "462873ef-1a4f-4c0d-b74c-404315a345db",
+                    "type": "Button",
+                    "id": "ae55386c-28b3-43e2-9654-ea6d80c859e3",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -225,9 +225,9 @@
                 },
                 {
                     "name": "",
-                    "id": "0457a07c-0bbc-40b4-8741-966481999c5a",
+                    "id": "40ffa5d0-f00b-4b69-8e8c-e1b0273dd86f",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "Press",
+                    "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "Shoot",

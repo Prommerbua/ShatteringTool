@@ -38,8 +38,6 @@ public class DelaunayControl : MonoBehaviour
     }
 
 
-
-
     void CalculateVoronoiOnCollision(Vector3 contactPoint)
     {
         _sw.Start();
@@ -73,11 +71,14 @@ public class DelaunayControl : MonoBehaviour
             foreach (var plane in vertex.cell.faces)
             {
                 center = Vector3.zero;
-                foreach(Vector3 v in plane.vertices) { center += v; }
+                foreach (Vector3 v in plane.vertices)
+                {
+                    center += v;
+                }
+
                 center /= plane.vertices.Count;
                 Vector3 normal = plane.plane.normal;
                 Vector3 fwd = Vector3.ProjectOnPlane(Vector3.forward, normal);
-
 
 
                 GameObject goCutPlane = new GameObject("CutPlane", typeof(BoxCollider), typeof(Rigidbody), typeof(SplitterSingleCut));
@@ -114,7 +115,6 @@ public class DelaunayControl : MonoBehaviour
         {
             Destroy(other.gameObject);
             CalculateVoronoiOnCollision(other.GetContact(0).point);
-
         }
     }
 

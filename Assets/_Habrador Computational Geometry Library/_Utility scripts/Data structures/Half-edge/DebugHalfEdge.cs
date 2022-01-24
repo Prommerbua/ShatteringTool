@@ -17,8 +17,8 @@ namespace Habrador_Computational_Geometry
                     continue;
                 }
 
-                Vector3 p1 = e.v.position.ToVector3();
-                Vector3 p2 = e.prevEdge.v.position.ToVector3();
+                UnityEngine.Vector3 p1 = e.v.position.ToVector3();
+                UnityEngine.Vector3 p2 = e.prevEdge.v.position.ToVector3();
 
                 //Local to global space
                 if (trans != null)

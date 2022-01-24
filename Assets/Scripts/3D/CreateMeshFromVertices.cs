@@ -14,7 +14,7 @@ public class CreateMeshFromVertices : MonoBehaviour
 
 
 
-    private HashSet<Vector3> vertices_Unity;
+    private HashSet<UnityEngine.Vector3> vertices_Unity;
 
     private HashSet<Mesh> voronoiCellsMeshes;
     [SerializeField] private int pointCount;
@@ -22,24 +22,24 @@ public class CreateMeshFromVertices : MonoBehaviour
 
     void Start()
     {
-        vertices_Unity = new HashSet<Vector3>();
+        vertices_Unity = new HashSet<UnityEngine.Vector3>();
 
         for (int i = 0; i < pointCount; i++)
         {
-            Vector3 point = srcMesh.mesh.GetRandomPointInsideNonConvex(srcMesh.GetComponent<Renderer>().bounds.center);
+            UnityEngine.Vector3 point = srcMesh.mesh.GetRandomPointInsideNonConvex(srcMesh.GetComponent<Renderer>().bounds.center);
             vertices_Unity.Add(point);
         }
 
 
 
 
-        HashSet<MyVector3> points = new HashSet<MyVector3>(vertices_Unity.Select(x => x.ToMyVector3()));
-        Normalizer3 normalizer = new Normalizer3(new List<MyVector3>(points));
-        HashSet<MyVector3> points_normalized = normalizer.Normalize(points);
+        HashSet<Vector3> points = new HashSet<Vector3>(vertices_Unity.Select(x => x.ToMyVector3()));
+        Normalizer3 normalizer = new Normalizer3(new List<Vector3>(points));
+        HashSet<Vector3> points_normalized = normalizer.Normalize(points);
 
         //Convex Hull
-        
-        
+
+
         HalfEdgeData3 convexHull_normalized = _ConvexHull.Iterative_3D(points_normalized, removeUnwantedTriangles: false, normalizer);
         //HalfEdgeData3 convexHull_unnormalized = _ConvexHull.Iterative_3D(points, removeUnwantedTriangles: false, normalizer);
 
@@ -100,21 +100,21 @@ public class CreateMeshFromVertices : MonoBehaviour
 
         foreach (VoronoiCell3 cell in voronoiCells)
         {
-            List<Vector3> vertices = new List<Vector3>();
+            List<UnityEngine.Vector3> vertices = new List<UnityEngine.Vector3>();
 
             List<int> triangles = new List<int>();
 
-            List<Vector3> normals = new List<Vector3>();
+            List<UnityEngine.Vector3> normals = new List<UnityEngine.Vector3>();
 
             List<VoronoiEdge3> edges = cell.edges;
 
             //This is the center of the cell
             //To build the mesh, we just add triangles from the edges to the site pos
-            MyVector3 sitePos = cell.sitePos;
+            Vector3 sitePos = cell.sitePos;
 
             //In 3d space, the corners in the voronoi cell are not on the plane, so shading becomes bad
             //Shading improves if we calculate an average site pos by looking at each corner in the cell
-            MyVector3 averageSitePos = default;
+            Vector3 averageSitePos = default;
 
             for (int i = 0; i < edges.Count; i++)
             {
@@ -180,10 +180,10 @@ public class CreateMeshFromVertices : MonoBehaviour
     {
         Mesh voronoiCellsMesh = new Mesh();
 
-        List<Vector3> vertices = new List<Vector3>();
+        List<UnityEngine.Vector3> vertices = new List<UnityEngine.Vector3>();
         List<int> triangles = new List<int>();
         List<Color> vertexColors = new List<Color>();
-        List<Vector3> normals = new List<Vector3>();
+        List<UnityEngine.Vector3> normals = new List<UnityEngine.Vector3>();
 
         foreach (Mesh mesh in meshes)
         {

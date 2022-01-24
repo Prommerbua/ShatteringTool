@@ -9,24 +9,24 @@ namespace Habrador_Computational_Geometry
         //
         // Vectors
         //
-    
+
         //3d -> 2d
-        public static Vector2 XZ(this Vector3 v)
+        public static Vector2 XZ(this UnityEngine.Vector3 v)
         {
             return new Vector2(v.x, v.z);
         }
 
         //2d -> 3d where default y is 0f
-        public static Vector3 XYZ(this Vector2 v, float yPos = 0f)
+        public static UnityEngine.Vector3 XYZ(this Vector2 v, float yPos = 0f)
         {
-            return new Vector3(v.x, yPos, v.y);
+            return new UnityEngine.Vector3(v.x, yPos, v.y);
         }
 
 
         //Convert between vectors: myvector3 to vector3, etc
 
         //Vector3 - MyVector2
-        public static MyVector2 ToMyVector2(this Vector3 v)
+        public static MyVector2 ToMyVector2(this UnityEngine.Vector3 v)
         {
             return new MyVector2(v.x, v.z);
         }
@@ -38,21 +38,21 @@ namespace Habrador_Computational_Geometry
         }
 
         //Vector3 -> MyVector3
-        public static MyVector3 ToMyVector3(this Vector3 v)
-        {
-            return new MyVector3(v.x, v.y, v.z);
-        }
-
-        //MyVector3 -> Vector3
-        public static Vector3 ToVector3(this MyVector3 v)
+        public static Vector3 ToMyVector3(this UnityEngine.Vector3 v)
         {
             return new Vector3(v.x, v.y, v.z);
         }
 
-        //MyVector2 -> Vector3
-        public static Vector3 ToVector3(this MyVector2 v, float yPos = 0f)
+        //MyVector3 -> Vector3
+        public static UnityEngine.Vector3 ToVector3(this Vector3 v)
         {
-            return new Vector3(v.x, yPos, v.y);
+            return new UnityEngine.Vector3(v.x, v.y, v.z);
+        }
+
+        //MyVector2 -> Vector3
+        public static UnityEngine.Vector3 ToVector3(this MyVector2 v, float yPos = 0f)
+        {
+            return new UnityEngine.Vector3(v.x, yPos, v.y);
         }
 
         //MyVector2 -> Vector2
@@ -62,16 +62,12 @@ namespace Habrador_Computational_Geometry
         }
 
         //MyVector2 -> MyVector3 (2d x is 3d x, 2d y is 3d z)
-        public static MyVector3 ToMyVector3_Yis3D(this MyVector2 v, float yPos = 0f)
+        public static Vector3 ToMyVector3_Yis3D(this MyVector2 v, float yPos = 0f)
         {
-            return new MyVector3(v.x, yPos, v.y);
+            return new Vector3(v.x, yPos, v.y);
         }
 
-        //MyVector3 -> MyVector2
-        public static MyVector2 ToMyVector2(this MyVector3 v)
-        {
-            return new MyVector2(v.x, v.z);
-        }
+
 
 
 
@@ -83,7 +79,7 @@ namespace Habrador_Computational_Geometry
         public static T FakePop<T>(this HashSet<T> hashSet)
         {
             T firstBestT = default;
-        
+
             foreach (T thisT in hashSet)
             {
                 firstBestT = thisT;
@@ -118,7 +114,7 @@ namespace Habrador_Computational_Geometry
         //
 
         //Add b to a
-        //Operator overloads dont work unless they are in the Matrix4x4 class 
+        //Operator overloads dont work unless they are in the Matrix4x4 class
         public static Matrix4x4 Add(this Matrix4x4 a, Matrix4x4 b)
         {
             //Can access element in matric by [row, column]

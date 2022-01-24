@@ -529,7 +529,7 @@ namespace Habrador_Computational_Geometry
         {
             foreach (LinkedVertex v in vertices)
             {
-                Debug.DrawLine(v.pos.ToVector3(), Vector3.zero, Color.blue, 3f);
+                Debug.DrawLine(v.pos.ToVector3(), UnityEngine.Vector3.zero, Color.blue, 3f);
             }
         }
     }

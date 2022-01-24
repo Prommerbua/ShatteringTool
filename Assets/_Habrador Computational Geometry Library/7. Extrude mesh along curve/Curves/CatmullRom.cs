@@ -9,13 +9,13 @@ namespace Habrador_Computational_Geometry
     public class CatmullRom : _Curve
     {
         //Start and end point
-        public MyVector3 posA;
-        public MyVector3 posB;
+        public Vector3 posA;
+        public Vector3 posB;
         //Handles connected to the start and end points
-        public MyVector3 handleA;
-        public MyVector3 handleB;
+        public Vector3 handleA;
+        public Vector3 handleB;
 
-        public CatmullRom(MyVector3 posA, MyVector3 posB, MyVector3 handleA, MyVector3 handleB)
+        public CatmullRom(Vector3 posA, Vector3 posB, Vector3 handleA, Vector3 handleB)
         {
             this.posA = posA;
             this.posB = posB;
@@ -30,9 +30,9 @@ namespace Habrador_Computational_Geometry
         // Position
         //
 
-        public override MyVector3 GetPosition(float t)
+        public override Vector3 GetPosition(float t)
         {
-            MyVector3 interpolatedValue = GetPosition(posA, posB, handleA, handleB, t);
+            Vector3 interpolatedValue = GetPosition(posA, posB, handleA, handleB, t);
 
             return interpolatedValue;
         }
@@ -42,23 +42,23 @@ namespace Habrador_Computational_Geometry
         //So if you have a set of points and want a smooth path between these points, you don't have to bother with handles
         //to determine the shape of the curve
         //http://www.iquilezles.org/www/articles/minispline/minispline.htm
-        public static MyVector3 GetPosition(MyVector3 posA, MyVector3 posB, MyVector3 handleA, MyVector3 handleB, float t)
+        public static Vector3 GetPosition(Vector3 posA, Vector3 posB, Vector3 handleA, Vector3 handleB, float t)
         {
-            MyVector3 p0 = handleA;
-            MyVector3 p1 = posA;
-            MyVector3 p2 = posB;
-            MyVector3 p3 = handleB;
+            Vector3 p0 = handleA;
+            Vector3 p1 = posA;
+            Vector3 p2 = posB;
+            Vector3 p3 = handleB;
 
             t = Mathf.Clamp01(t);
 
             //The coefficients of the cubic polynomial (except the 0.5f * which is added later for performance)
-            MyVector3 a = 2f * p1;
-            MyVector3 b = p2 - p0;
-            MyVector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
-            MyVector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
+            Vector3 a = 2f * p1;
+            Vector3 b = p2 - p0;
+            Vector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
+            Vector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
 
             //The cubic polynomial: a + b * t + c * t^2 + d * t^3
-            MyVector3 interpolatedPos = 0.5f * (a + (b * t) + (c * t * t) + (d * t * t * t));
+            Vector3 interpolatedPos = 0.5f * (a + (b * t) + (c * t * t) + (d * t * t * t));
 
             return interpolatedPos;
         }
@@ -71,61 +71,61 @@ namespace Habrador_Computational_Geometry
 
         public override float GetDerivative(float t)
         {
-            MyVector3 derivativeVec = GetDerivativeVec(posA, posB, handleA, handleB, t);
+            Vector3 derivativeVec = GetDerivativeVec(posA, posB, handleA, handleB, t);
 
-            float derivative = MyVector3.Magnitude(derivativeVec);
+            float derivative = Vector3.Magnitude(derivativeVec);
 
             return derivative;
         }
 
-        public static MyVector3 GetDerivativeVec(MyVector3 posA, MyVector3 posB, MyVector3 handleA, MyVector3 handleB, float t)
+        public static Vector3 GetDerivativeVec(Vector3 posA, Vector3 posB, Vector3 handleA, Vector3 handleB, float t)
         {
-            MyVector3 p0 = handleA;
-            MyVector3 p1 = posA;
-            MyVector3 p2 = posB;
-            MyVector3 p3 = handleB;
+            Vector3 p0 = handleA;
+            Vector3 p1 = posA;
+            Vector3 p2 = posB;
+            Vector3 p3 = handleB;
 
             t = Mathf.Clamp01(t);
 
             //The coefficients of the cubic polynomial (except the 0.5f * which is added later for performance)
             //MyVector3 a = 2f * p1;
-            MyVector3 b = p2 - p0;
-            MyVector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
-            MyVector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
+            Vector3 b = p2 - p0;
+            Vector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
+            Vector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
 
             //Position is: a + b * t + c * t^2 + d * t^3
             //Derivative: b + t*2c + t^2 * 3d
 
-            MyVector3 derivativeVec = b + t * 2f * c + t * t * 3f * d;
+            Vector3 derivativeVec = b + t * 2f * c + t * t * 3f * d;
 
             return derivativeVec;
         }
 
-        public static MyVector3 GetSecondDerivativeVec(MyVector3 posA, MyVector3 posB, MyVector3 handleA, MyVector3 handleB, float t)
+        public static Vector3 GetSecondDerivativeVec(Vector3 posA, Vector3 posB, Vector3 handleA, Vector3 handleB, float t)
         {
-            MyVector3 p0 = handleA;
-            MyVector3 p1 = posA;
-            MyVector3 p2 = posB;
-            MyVector3 p3 = handleB;
+            Vector3 p0 = handleA;
+            Vector3 p1 = posA;
+            Vector3 p2 = posB;
+            Vector3 p3 = handleB;
 
             t = Mathf.Clamp01(t);
 
             //The coefficients of the cubic polynomial (except the 0.5f * which is added later for performance)
             //MyVector3 a = 2f * p1;
             //MyVector3 b = p2 - p0;
-            MyVector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
-            MyVector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
+            Vector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
+            Vector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
 
             //Position is: a + b * t + c * t^2 + d * t^3
             //Derivative: b + t*2c + t^2 * 3d
             //Second derivative: 2c + 2*t*3d = 2c + t * 6d
 
-            MyVector3 derivativeVec = 2f * c + t * 6f * d;
+            Vector3 derivativeVec = 2f * c + t * 6f * d;
 
             return derivativeVec;
         }
 
-        public override MyVector3 GetSecondDerivativeVec(float t)
+        public override Vector3 GetSecondDerivativeVec(float t)
         {
             return GetSecondDerivativeVec(posA, posB, handleA, handleB, t);
         }
@@ -136,17 +136,17 @@ namespace Habrador_Computational_Geometry
         // Tangent
         //
 
-        public static MyVector3 GetTangent(MyVector3 posA, MyVector3 posB, MyVector3 handleA, MyVector3 handleB, float t)
+        public static Vector3 GetTangent(Vector3 posA, Vector3 posB, Vector3 handleA, Vector3 handleB, float t)
         {
             //The tangent is also the derivative vector
-            MyVector3 tangent = MyVector3.Normalize(GetDerivativeVec(posA, posB, handleA, handleB, t));
+            Vector3 tangent = Vector3.Normalize(GetDerivativeVec(posA, posB, handleA, handleB, t));
 
             return tangent;
         }
 
-        public override MyVector3 GetTangent(float t)
+        public override Vector3 GetTangent(float t)
         {
-            MyVector3 tangent = GetTangent(posA, posB, handleA, handleB, t);
+            Vector3 tangent = GetTangent(posA, posB, handleA, handleB, t);
 
             return tangent;
         }

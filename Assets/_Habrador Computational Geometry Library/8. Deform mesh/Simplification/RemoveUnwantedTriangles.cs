@@ -118,7 +118,7 @@ namespace Habrador_Computational_Geometry
                     //TestAlgorithmsHelpMethods.DebugDrawTriangle(triangle, Color.blue, Color.red, normalizer);
 
                     //Remove the needle by merging the shortest edge
-                    MyVector3 mergePosition = (e1.v.position + e1.prevEdge.v.position) * 0.5f;
+                    Vector3 mergePosition = (e1.v.position + e1.prevEdge.v.position) * 0.5f;
 
                     meshData.ContractTriangleHalfEdge(e1, mergePosition);
 
@@ -153,7 +153,7 @@ namespace Habrador_Computational_Geometry
                     HalfEdgeVertex3 v3 = vertex.edge.oppositeEdge.nextEdge.v;
 
                     //Build a plane
-                    MyVector3 normal = MyVector3.Normalize(MyVector3.Cross(v3.position - v2.position, v1.position - v2.position));
+                    Vector3 normal = Vector3.Normalize(Vector3.Cross(v3.position - v2.position, v1.position - v2.position));
 
                     Plane3 plane = new Plane3(v1.position, normal);
 
@@ -166,9 +166,9 @@ namespace Habrador_Computational_Geometry
                     {
                         //Debug.Log("Found flat tetrahedron");
 
-                        Vector3 p1 = normalizer.UnNormalize(v1.position).ToVector3();
-                        Vector3 p2 = normalizer.UnNormalize(v2.position).ToVector3();
-                        Vector3 p3 = normalizer.UnNormalize(v3.position).ToVector3();
+                        UnityEngine.Vector3 p1 = normalizer.UnNormalize(v1.position).ToVector3();
+                        UnityEngine.Vector3 p2 = normalizer.UnNormalize(v2.position).ToVector3();
+                        UnityEngine.Vector3 p3 = normalizer.UnNormalize(v3.position).ToVector3();
 
                         //TestAlgorithmsHelpMethods.DebugDrawTriangle(p1, p2, p3, normal.ToVector3(), Color.blue, Color.red);
 

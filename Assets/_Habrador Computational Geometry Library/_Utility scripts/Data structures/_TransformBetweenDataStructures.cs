@@ -162,13 +162,13 @@ namespace Habrador_Computational_Geometry
 
             //Step 2. Create the list with unique vertices
             //A hashset will make it fast to check if a vertex already exists in the collection
-            HashSet<MyVector3> uniqueVertices = new HashSet<MyVector3>();
+            HashSet<Vector3> uniqueVertices = new HashSet<Vector3>();
 
             foreach (Triangle3 t in triangles)
             {
-                MyVector3 v1 = t.p1;
-                MyVector3 v2 = t.p2;
-                MyVector3 v3 = t.p3;
+                Vector3 v1 = t.p1;
+                Vector3 v2 = t.p2;
+                Vector3 v3 = t.p3;
 
                 if (!uniqueVertices.Contains(v1))
                 {
@@ -185,14 +185,14 @@ namespace Habrador_Computational_Geometry
             }
 
             //Create the list with all vertices
-            List<MyVector3> meshVertices = new List<MyVector3>(uniqueVertices);
+            List<Vector3> meshVertices = new List<Vector3>(uniqueVertices);
 
 
             //Step3. Create the list with all triangles by using the unique vertices
             List<int> meshTriangles = new List<int>();
 
             //Use a dictionay to quickly find which positon in the list a Vector3 has
-            Dictionary<MyVector3, int> vector2Positons = new Dictionary<MyVector3, int>();
+            Dictionary<Vector3, int> vector2Positons = new Dictionary<Vector3, int>();
 
             for (int i = 0; i < meshVertices.Count; i++)
             {
@@ -201,9 +201,9 @@ namespace Habrador_Computational_Geometry
 
             foreach (Triangle3 t in triangles)
             {
-                MyVector3 v1 = t.p1;
-                MyVector3 v2 = t.p2;
-                MyVector3 v3 = t.p3;
+                Vector3 v1 = t.p1;
+                Vector3 v2 = t.p2;
+                Vector3 v3 = t.p3;
 
                 meshTriangles.Add(vector2Positons[v1]);
                 meshTriangles.Add(vector2Positons[v2]);
@@ -215,13 +215,13 @@ namespace Habrador_Computational_Geometry
             Mesh mesh = new Mesh();
 
             //From MyVector3 to Vector3
-            Vector3[] meshVerticesArray = new Vector3[meshVertices.Count];
+            UnityEngine.Vector3[] meshVerticesArray = new UnityEngine.Vector3[meshVertices.Count];
 
             for (int i = 0; i < meshVerticesArray.Length; i++)
             {
-                MyVector3 v = meshVertices[i];
+                Vector3 v = meshVertices[i];
 
-                meshVerticesArray[i] = new Vector3(v.x, v.y, v.z);
+                meshVerticesArray[i] = new UnityEngine.Vector3(v.x, v.y, v.z);
             }
 
             mesh.vertices = meshVerticesArray;
@@ -241,7 +241,7 @@ namespace Habrador_Computational_Geometry
         public static Mesh Triangle3ToMesh(HashSet<Triangle3> triangles)
         {
             //Create the list with all vertices and triangles
-            List<MyVector3> meshVertices = new List<MyVector3>();
+            List<Vector3> meshVertices = new List<Vector3>();
 
             //Create the list with all triangles
             List<int> meshTriangles = new List<int>();
@@ -250,9 +250,9 @@ namespace Habrador_Computational_Geometry
 
             foreach (Triangle3 t in triangles)
             {
-                MyVector3 v1 = t.p1;
-                MyVector3 v2 = t.p2;
-                MyVector3 v3 = t.p3;
+                Vector3 v1 = t.p1;
+                Vector3 v2 = t.p2;
+                Vector3 v3 = t.p3;
 
                 meshVertices.Add(v1);
                 meshVertices.Add(v2);
@@ -269,13 +269,13 @@ namespace Habrador_Computational_Geometry
             Mesh mesh = new Mesh();
 
             //From MyVector3 to Vector3
-            Vector3[] meshVerticesArray = new Vector3[meshVertices.Count];
+            UnityEngine.Vector3[] meshVerticesArray = new UnityEngine.Vector3[meshVertices.Count];
 
             for (int i = 0; i < meshVerticesArray.Length; i++)
             {
-                MyVector3 v = meshVertices[i];
+                Vector3 v = meshVertices[i];
 
-                meshVerticesArray[i] = new Vector3(v.x, v.y, v.z);
+                meshVerticesArray[i] = new UnityEngine.Vector3(v.x, v.y, v.z);
             }
 
             mesh.vertices = meshVerticesArray;

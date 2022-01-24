@@ -48,14 +48,14 @@ namespace Habrador_Computational_Geometry
     public class VoronoiEdge3
     {
         //These are the voronoi vertices
-        public MyVector3 p1;
-        public MyVector3 p2;
+        public Vector3 p1;
+        public Vector3 p2;
 
         //All positions within a voronoi cell is closer to this position than any other position in the diagram
         //Is also a vertex in the delaunay triangulation
-        public MyVector3 sitePos;
+        public Vector3 sitePos;
 
-        public VoronoiEdge3(MyVector3 p1, MyVector3 p2, MyVector3 sitePos)
+        public VoronoiEdge3(Vector3 p1, Vector3 p2, Vector3 sitePos)
         {
             this.p1 = p1;
             this.p2 = p2;
@@ -69,11 +69,11 @@ namespace Habrador_Computational_Geometry
     {
         //All positions within a voronoi cell is closer to this position than any other position in the diagram
         //Is also a vertex in the delaunay triangulation
-        public MyVector3 sitePos;
+        public Vector3 sitePos;
 
         public List<VoronoiEdge3> edges = new List<VoronoiEdge3>();
 
-        public VoronoiCell3(MyVector3 sitePos)
+        public VoronoiCell3(Vector3 sitePos)
         {
             this.sitePos = sitePos;
         }

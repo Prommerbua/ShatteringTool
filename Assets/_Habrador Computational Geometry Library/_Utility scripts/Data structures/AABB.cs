@@ -80,8 +80,8 @@ namespace Habrador_Computational_Geometry
     //Axis-Aligned-Bounding-Box, which is a box in 3d space aligned along the x-y-z axis
     public struct AABB3
     {
-        public MyVector3 max;
-        public MyVector3 min;
+        public Vector3 max;
+        public Vector3 min;
 
 
 
@@ -97,9 +97,9 @@ namespace Habrador_Computational_Geometry
 
 
         //We have a list with points and want to find the min and max values
-        public AABB3(List<MyVector3> points)
+        public AABB3(List<Vector3> points)
         {
-            MyVector3 p1 = points[0];
+            Vector3 p1 = points[0];
 
             this.min = p1;
             this.max = p1;
@@ -113,7 +113,7 @@ namespace Habrador_Computational_Geometry
             
             for (int i = 1; i < points.Count; i++)
             {
-                MyVector3 p = points[i];
+                Vector3 p = points[i];
 
                 //x
                 if (p.x < min.x)
@@ -173,15 +173,15 @@ namespace Habrador_Computational_Geometry
         {
             //Get the corners
             //top is y-axis, front is z-axis, and right is x-axis
-            MyVector3 topFR = new MyVector3(max.x, max.y, max.z);
-            MyVector3 topFL = new MyVector3(min.x, max.y, max.z);
-            MyVector3 topBR = new MyVector3(max.x, max.y, min.z);
-            MyVector3 topBL = new MyVector3(min.x, max.y, min.z);
+            Vector3 topFR = new Vector3(max.x, max.y, max.z);
+            Vector3 topFL = new Vector3(min.x, max.y, max.z);
+            Vector3 topBR = new Vector3(max.x, max.y, min.z);
+            Vector3 topBL = new Vector3(min.x, max.y, min.z);
 
-            MyVector3 bottomFR = new MyVector3(max.x, min.y, max.z);
-            MyVector3 bottomFL = new MyVector3(min.x, min.y, max.z);
-            MyVector3 bottomBR = new MyVector3(max.x, min.y, min.z);
-            MyVector3 bottomBL = new MyVector3(min.x, min.y, min.z);
+            Vector3 bottomFR = new Vector3(max.x, min.y, max.z);
+            Vector3 bottomFL = new Vector3(min.x, min.y, max.z);
+            Vector3 bottomBR = new Vector3(max.x, min.y, min.z);
+            Vector3 bottomBL = new Vector3(min.x, min.y, min.z);
 
 
             List<Edge3> edges = new List<Edge3>()
@@ -208,22 +208,22 @@ namespace Habrador_Computational_Geometry
 
 
         //Get all corners of the box
-        public HashSet<MyVector3> GetCorners()
+        public HashSet<Vector3> GetCorners()
         {
             //Get the corners
             //top is y-axis, front is z-axis, and right is x-axis
-            MyVector3 topFR = new MyVector3(max.x, max.y, max.z);
-            MyVector3 topFL = new MyVector3(min.x, max.y, max.z);
-            MyVector3 topBR = new MyVector3(max.x, max.y, min.z);
-            MyVector3 topBL = new MyVector3(min.x, max.y, min.z);
+            Vector3 topFR = new Vector3(max.x, max.y, max.z);
+            Vector3 topFL = new Vector3(min.x, max.y, max.z);
+            Vector3 topBR = new Vector3(max.x, max.y, min.z);
+            Vector3 topBL = new Vector3(min.x, max.y, min.z);
 
-            MyVector3 bottomFR = new MyVector3(max.x, min.y, max.z);
-            MyVector3 bottomFL = new MyVector3(min.x, min.y, max.z);
-            MyVector3 bottomBR = new MyVector3(max.x, min.y, min.z);
-            MyVector3 bottomBL = new MyVector3(min.x, min.y, min.z);
+            Vector3 bottomFR = new Vector3(max.x, min.y, max.z);
+            Vector3 bottomFL = new Vector3(min.x, min.y, max.z);
+            Vector3 bottomBR = new Vector3(max.x, min.y, min.z);
+            Vector3 bottomBL = new Vector3(min.x, min.y, min.z);
 
 
-            HashSet<MyVector3> corners = new HashSet<MyVector3>()
+            HashSet<Vector3> corners = new HashSet<Vector3>()
             {
                 topFR,
                 topFL,

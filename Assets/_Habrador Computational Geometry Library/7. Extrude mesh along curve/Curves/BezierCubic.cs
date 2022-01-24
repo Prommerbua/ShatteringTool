@@ -9,14 +9,14 @@ namespace Habrador_Computational_Geometry
     public class BezierCubic : _Curve
     {
         //Start and end points
-        public MyVector3 posA;
-        public MyVector3 posB;
+        public Vector3 posA;
+        public Vector3 posB;
         //Handles connected to the start and end points
-        public MyVector3 handlePosA;
-        public MyVector3 handlePosB;
+        public Vector3 handlePosA;
+        public Vector3 handlePosB;
 
 
-        public BezierCubic(MyVector3 posA, MyVector3 posB, MyVector3 handleA, MyVector3 handleB)
+        public BezierCubic(Vector3 posA, Vector3 posB, Vector3 handleA, Vector3 handleB)
         {
             this.posA = posA;
             this.posB = posB;
@@ -30,15 +30,15 @@ namespace Habrador_Computational_Geometry
         // Position at point t
         //
 
-        public override MyVector3 GetPosition(float t)
+        public override Vector3 GetPosition(float t)
         {
-            MyVector3 interpolatedValue = GetPosition(posA, posB, handlePosA, handlePosB, t);
+            Vector3 interpolatedValue = GetPosition(posA, posB, handlePosA, handlePosB, t);
 
             return interpolatedValue;
         }
 
         //Uses de Casteljau's algorithm 
-        public static MyVector3 GetPosition(MyVector3 posA, MyVector3 posB, MyVector3 handlePosA, MyVector3 handlePosB, float t)
+        public static Vector3 GetPosition(Vector3 posA, Vector3 posB, Vector3 handlePosA, Vector3 handlePosB, float t)
         {
             t = Mathf.Clamp01(t);
 
@@ -74,12 +74,12 @@ namespace Habrador_Computational_Geometry
             //A - 3t(A - B) + t^2(3A - 6B + 3C) + t^3(-A + 3B - 3C + D)
             //A - 3t(A - B) + t^2(3(A - 2B + C)) + t^3(-(A - 3(B - C) - D)
 
-            MyVector3 A = posA;
-            MyVector3 B = handlePosA;
-            MyVector3 C = handlePosB;
-            MyVector3 D = posB;
+            Vector3 A = posA;
+            Vector3 B = handlePosA;
+            Vector3 C = handlePosB;
+            Vector3 D = posB;
 
-            MyVector3 finalInterpolation = A;
+            Vector3 finalInterpolation = A;
 
             finalInterpolation += -t * (3f * (A - B));
 
@@ -98,7 +98,7 @@ namespace Habrador_Computational_Geometry
         //
 
         //This direction is always tangent to the curve
-        public static MyVector3 GetTangent(MyVector3 posA, MyVector3 posB, MyVector3 handlePosA, MyVector3 handlePosB, float t)
+        public static Vector3 GetTangent(Vector3 posA, Vector3 posB, Vector3 handlePosA, Vector3 handlePosB, float t)
         {
             t = Mathf.Clamp01(t);
 
@@ -111,14 +111,14 @@ namespace Habrador_Computational_Geometry
 
             //Alternative 2
             //The tangent is also the derivative vector
-            MyVector3 tangent = MyVector3.Normalize(GetDerivativeVec(posA, posB, handlePosA, handlePosB, t));
+            Vector3 tangent = Vector3.Normalize(GetDerivativeVec(posA, posB, handlePosA, handlePosB, t));
 
             return tangent;
         }
 
-        public override MyVector3 GetTangent(float t)
+        public override Vector3 GetTangent(float t)
         {
-            MyVector3 tangent = GetTangent(posA, posB, handlePosA, handlePosB, t);
+            Vector3 tangent = GetTangent(posA, posB, handlePosA, handlePosB, t);
 
             return tangent;
         }
@@ -136,27 +136,27 @@ namespace Habrador_Computational_Geometry
             //float derivative = InterpolationHelpMethods.EstimateDerivative(this, t);
 
             //Alternative 2. Exact
-            MyVector3 derivativeVec = GetDerivativeVec(posA, posB, handlePosA, handlePosB, t);
+            Vector3 derivativeVec = GetDerivativeVec(posA, posB, handlePosA, handlePosB, t);
 
-            float derivative = MyVector3.Magnitude(derivativeVec);
+            float derivative = Vector3.Magnitude(derivativeVec);
 
             return derivative;
         }
 
-        public static MyVector3 GetDerivativeVec(MyVector3 posA, MyVector3 posB, MyVector3 handlePosA, MyVector3 handlePosB, float t)
+        public static Vector3 GetDerivativeVec(Vector3 posA, Vector3 posB, Vector3 handlePosA, Vector3 handlePosB, float t)
         {
             t = Mathf.Clamp01(t);
 
-            MyVector3 A = posA;
-            MyVector3 B = handlePosA;
-            MyVector3 C = handlePosB;
-            MyVector3 D = posB;
+            Vector3 A = posA;
+            Vector3 B = handlePosA;
+            Vector3 C = handlePosB;
+            Vector3 D = posB;
 
             //The derivative of the equation we use when finding position along the curve at t: 
             //-3(A - B) + 2t(3(A - 2B + C)) + 3t^2(-(A - 3(B - C) - D)
             //-3(A - B) + t(6(A - 2B + C)) + t^2(-3(A - 3(B - C) - D)
 
-            MyVector3 derivativeVector = -3f * (A - B);
+            Vector3 derivativeVector = -3f * (A - B);
 
             derivativeVector += t * (6f * (A - 2f * B + C));
 
@@ -167,27 +167,27 @@ namespace Habrador_Computational_Geometry
 
 
         //Second derivative
-        public static MyVector3 GetSecondDerivativeVec(MyVector3 posA, MyVector3 posB, MyVector3 handlePosA, MyVector3 handlePosB, float t)
+        public static Vector3 GetSecondDerivativeVec(Vector3 posA, Vector3 posB, Vector3 handlePosA, Vector3 handlePosB, float t)
         {
             t = Mathf.Clamp01(t);
 
-            MyVector3 A = posA;
-            MyVector3 B = handlePosA;
-            MyVector3 C = handlePosB;
-            MyVector3 D = posB;
+            Vector3 A = posA;
+            Vector3 B = handlePosA;
+            Vector3 C = handlePosB;
+            Vector3 D = posB;
 
             //The second derivative of the equation we use when finding position along the curve at t: 
             //6(A - 2B + C) + 2t(-3(A - 3(B - C) - D))
             //6(A - 2B + C) + t(-6(A - 3(B - C) - D))
 
-            MyVector3 secondDerivativeVec = 6f * (A - 2 * B + C);
+            Vector3 secondDerivativeVec = 6f * (A - 2 * B + C);
 
             secondDerivativeVec += t * (-6f * (A - 3f * (B - C) - D));
 
             return secondDerivativeVec;
         }
 
-        public override MyVector3 GetSecondDerivativeVec(float t)
+        public override Vector3 GetSecondDerivativeVec(float t)
         {
             return GetSecondDerivativeVec(posA, posB, handlePosA, handlePosB, t);
         }

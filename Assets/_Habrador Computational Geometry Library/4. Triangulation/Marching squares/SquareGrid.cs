@@ -80,11 +80,11 @@ namespace Habrador_Computational_Geometry.Marching_Squares
             Mesh mesh = new Mesh();
 
             //Convert from 2d to 3d
-            Vector3[] meshVertices = new Vector3[vertices.Count];
+            UnityEngine.Vector3[] meshVertices = new UnityEngine.Vector3[vertices.Count];
 
             for (int i = 0; i < vertices.Count; i++)
             {
-                Vector3 v = vertices[i].ToVector3(meshHeight);
+                UnityEngine.Vector3 v = vertices[i].ToVector3(meshHeight);
 
                 meshVertices[i] = v;
             }

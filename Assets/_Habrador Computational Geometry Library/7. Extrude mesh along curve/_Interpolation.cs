@@ -19,12 +19,12 @@ namespace Habrador_Computational_Geometry
         }
 
         //3d
-        public static MyVector3 Lerp(MyVector3 a, MyVector3 b, float t)
+        public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
         {
             t = Mathf.Clamp01(t);
 
             //Same as Mathf.Lerp(a, b, t);
-            MyVector3 interpolatedValue = (1f - t) * a + t * b;
+            Vector3 interpolatedValue = (1f - t) * a + t * b;
 
             return interpolatedValue;
         }

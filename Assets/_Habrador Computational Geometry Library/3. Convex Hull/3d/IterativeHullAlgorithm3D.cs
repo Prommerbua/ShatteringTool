@@ -11,14 +11,14 @@ namespace Habrador_Computational_Geometry
     public static class IterativeHullAlgorithm3D
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="points">The points from which we want to build the convex hull</param>
-        /// <param name="removeUnwantedTriangles">At the end of the algorithm, try to remove triangles from the hull that we dont want, 
+        /// <param name="removeUnwantedTriangles">At the end of the algorithm, try to remove triangles from the hull that we dont want,
         //such as needles where one edge is much shorter than the other edges in the triangle</param>
         /// <param name="normalizer">Is only needed for debugging</param>
         /// <returns></returns>
-        public static HalfEdgeData3 GenerateConvexHull(HashSet<MyVector3> points, bool removeUnwantedTriangles, Normalizer3 normalizer = null)
+        public static HalfEdgeData3 GenerateConvexHull(HashSet<Vector3> points, bool removeUnwantedTriangles, Normalizer3 normalizer = null)
         {
             HalfEdgeData3 convexHull = new HalfEdgeData3();
 
@@ -37,18 +37,18 @@ namespace Habrador_Computational_Geometry
 
             //return convexHull;
 
-            //Step 2. For each other point: 
+            //Step 2. For each other point:
             // -If the point is within the hull constrcuted so far, remove it
             // - Otherwise, see which triangles are visible to the point and remove them
             //   Then build new triangles from the edges that have no neighbor to the point
 
-            List<MyVector3> pointsToAdd = new List<MyVector3>(points);
+            List<Vector3> pointsToAdd = new List<Vector3>(points);
 
             int removedPointsCounter = 0;
 
             //int debugCounter = 0;
 
-            foreach (MyVector3 p in pointsToAdd)
+            foreach (Vector3 p in pointsToAdd)
             {
                 //Is this point within the tetrahedron
                 bool isWithinHull = _Intersections.PointWithinConvexHull(p, convexHull);
@@ -68,7 +68,7 @@ namespace Habrador_Computational_Geometry
                 HashSet<HalfEdge3> borderEdges = null;
 
                 FindVisibleTrianglesAndBorderEdgesFromPoint(p, convexHull, out visibleTriangles, out borderEdges);
-                
+
 
                 //Remove all visible triangles
                 foreach (HalfEdgeFace3 triangle in visibleTriangles)
@@ -77,19 +77,19 @@ namespace Habrador_Computational_Geometry
                 }
 
 
-                //Make new triangle by connecting all edges on the border with the point 
+                //Make new triangle by connecting all edges on the border with the point
                 //Debug.Log($"Number of border edges: {borderEdges.Count}");
                 //int debugStop = 11;
 
                 //Save all ned edges so we can connect them with an opposite edge
                 //To make it faster you can use the ideas in the Valve paper to get a sorted list of newEdges
-                HashSet<HalfEdge3> newEdges = new HashSet<HalfEdge3>(); 
+                HashSet<HalfEdge3> newEdges = new HashSet<HalfEdge3>();
 
                 foreach(HalfEdge3 borderEdge in borderEdges)
                 {
                     //Each edge is point TO a vertex
-                    MyVector3 p1 = borderEdge.prevEdge.v.position;
-                    MyVector3 p2 = borderEdge.v.position;
+                    Vector3 p1 = borderEdge.prevEdge.v.position;
+                    Vector3 p2 = borderEdge.v.position;
 
                     /*
                     if (debugCounter > debugStop)
@@ -126,7 +126,7 @@ namespace Habrador_Computational_Geometry
                     HalfEdge3 e1 = newTriangle.edge;
                     //HalfEdge3 e2 = newTriangle.edge.nextEdge;
                     HalfEdge3 e3 = newTriangle.edge.nextEdge.nextEdge;
-                    
+
                     newEdges.Add(e1);
                     //newEdges.Add(e2);
                     newEdges.Add(e3);
@@ -146,7 +146,7 @@ namespace Habrador_Computational_Geometry
                 //timer.Stop();
 
 
-                //Connect all new triangles and the triangles on the border, 
+                //Connect all new triangles and the triangles on the border,
                 //so each edge has an opposite edge or flood filling will be impossible
                 //timer.Start();
                 //convexHull.ConnectAllEdges();
@@ -167,7 +167,7 @@ namespace Habrador_Computational_Geometry
 
 
             //
-            // Clean up 
+            // Clean up
             //
 
             //Merge concave edges according to the paper
@@ -183,8 +183,8 @@ namespace Habrador_Computational_Geometry
             {
                 convexHull = MeshSimplification_QEM.Simplify(convexHull, maxEdgesToContract: int.MaxValue, maxError: 0.0001f, normalizeTriangles: true);
             }
-                
-            
+
+
             return convexHull;
         }
 
@@ -192,10 +192,10 @@ namespace Habrador_Computational_Geometry
 
         //Find all visible triangles from a point
         //Also find edges on the border between invisible and visible triangles
-        public static void FindVisibleTrianglesAndBorderEdgesFromPoint(MyVector3 p, HalfEdgeData3 convexHull, out HashSet<HalfEdgeFace3> visibleTriangles, out HashSet<HalfEdge3> borderEdges)
+        public static void FindVisibleTrianglesAndBorderEdgesFromPoint(Vector3 p, HalfEdgeData3 convexHull, out HashSet<HalfEdgeFace3> visibleTriangles, out HashSet<HalfEdge3> borderEdges)
         {
             //Flood-fill from the visible triangle to find all other visible triangles
-            //When you cross an edge from a visible triangle to an invisible triangle, 
+            //When you cross an edge from a visible triangle to an invisible triangle,
             //save the edge because thhose edge should be used to build triangles with the point
             //These edges should belong to the triangle which is not visible
             borderEdges = new HashSet<HalfEdge3>();
@@ -221,7 +221,7 @@ namespace Habrador_Computational_Geometry
             //The queue which we will use when flood-filling
             Queue<HalfEdgeFace3> trianglesToFloodFrom = new Queue<HalfEdgeFace3>();
 
-            //Add the first triangle to init the flood-fill 
+            //Add the first triangle to init the flood-fill
             trianglesToFloodFrom.Enqueue(visibleTriangle);
 
             List<HalfEdge3> edgesToCross = new List<HalfEdge3>();
@@ -269,7 +269,7 @@ namespace Habrador_Computational_Geometry
                     }
 
                     //Check if this triangle is visible
-                    //A triangle is visible from a point the point is outside of a plane formed with the triangles position and normal 
+                    //A triangle is visible from a point the point is outside of a plane formed with the triangles position and normal
                     Plane3 plane = new Plane3(oppositeTriangle.edge.v.position, oppositeTriangle.edge.v.normal);
 
                     bool isPointOutsidePlane = _Geometry.IsPointOutsidePlane(p, plane);
@@ -279,7 +279,7 @@ namespace Habrador_Computational_Geometry
                     {
                         trianglesToFloodFrom.Enqueue(oppositeTriangle);
                     }
-                    //This triangle is invisible. Since we only flood from visible triangles, 
+                    //This triangle is invisible. Since we only flood from visible triangles,
                     //it means we crossed from a visible triangle to an invisible triangle, so save the crossing edge
                     else
                     {
@@ -302,13 +302,13 @@ namespace Habrador_Computational_Geometry
 
 
         //Find a visible triangle from a point
-        private static HalfEdgeFace3 FindVisibleTriangleFromPoint(MyVector3 p, HashSet<HalfEdgeFace3> triangles)
+        private static HalfEdgeFace3 FindVisibleTriangleFromPoint(Vector3 p, HashSet<HalfEdgeFace3> triangles)
         {
             HalfEdgeFace3 visibleTriangle = null;
 
             foreach (HalfEdgeFace3 triangle in triangles)
             {
-                //A triangle is visible from a point the point is outside of a plane formed with the triangles position and normal 
+                //A triangle is visible from a point the point is outside of a plane formed with the triangles position and normal
                 Plane3 plane = new Plane3(triangle.edge.v.position, triangle.edge.v.normal);
 
                 bool isPointOutsidePlane = _Geometry.IsPointOutsidePlane(p, plane);
@@ -331,19 +331,19 @@ namespace Habrador_Computational_Geometry
         //We could use the ideas from Quickhull to make the start triangle as big as possible
         //Then find a point which is the furthest away as possible from these triangles
         //Add that point and you have a tetrahedron (triangular pyramid)
-        public static void BuildFirstTetrahedron(HashSet<MyVector3> points, HalfEdgeData3 convexHull)
+        public static void BuildFirstTetrahedron(HashSet<Vector3> points, HalfEdgeData3 convexHull)
         {
             //Of all points, find the two points that are furthes away from each other
             Edge3 eFurthestApart = FindEdgeFurthestApart(points);
 
-            //Remove the two points we found         
+            //Remove the two points we found
             points.Remove(eFurthestApart.p1);
             points.Remove(eFurthestApart.p2);
 
 
             //Find a point which is the furthest away from this edge
             //TODO: Is this point also on the AABB? So we don't have to search all remaining points...
-            MyVector3 pointFurthestAway = FindPointFurthestFromEdge(eFurthestApart, points);
+            Vector3 pointFurthestAway = FindPointFurthestFromEdge(eFurthestApart, points);
 
             //Remove the point
             points.Remove(pointFurthestAway);
@@ -358,9 +358,9 @@ namespace Habrador_Computational_Geometry
             //Now we can build two triangles
             //It doesnt matter how we build these triangles as long as they are opposite
             //But the normal matters, so make sure it is calculated so the triangles are ordered clock-wise while the normal is pointing out
-            MyVector3 p1 = eFurthestApart.p1;
-            MyVector3 p2 = eFurthestApart.p2;
-            MyVector3 p3 = pointFurthestAway;
+            Vector3 p1 = eFurthestApart.p1;
+            Vector3 p2 = eFurthestApart.p2;
+            Vector3 p3 = pointFurthestAway;
 
             convexHull.AddTriangle(p1, p2, p3);
             convexHull.AddTriangle(p1, p3, p2);
@@ -383,7 +383,7 @@ namespace Habrador_Computational_Geometry
             Plane3 plane = new Plane3(triangle.edge.v.position, triangle.edge.v.normal);
 
             //Find the point furthest away from the plane
-            MyVector3 p4 = FindPointFurthestAwayFromPlane(points, plane);
+            Vector3 p4 = FindPointFurthestAwayFromPlane(points, plane);
 
             //Remove the point
             points.Remove(p4);
@@ -404,17 +404,17 @@ namespace Habrador_Computational_Geometry
                 triangleToKeep = triangles[0];
             }
 
-            //Delete the triangle 
+            //Delete the triangle
             convexHull.DeleteFace(triangleToRemove);
 
             //Build three new triangles
 
             //The triangle we keep is ordered clock-wise:
-            MyVector3 p1_opposite = triangleToKeep.edge.v.position;
-            MyVector3 p2_opposite = triangleToKeep.edge.nextEdge.v.position;
-            MyVector3 p3_opposite = triangleToKeep.edge.nextEdge.nextEdge.v.position;
+            Vector3 p1_opposite = triangleToKeep.edge.v.position;
+            Vector3 p2_opposite = triangleToKeep.edge.nextEdge.v.position;
+            Vector3 p3_opposite = triangleToKeep.edge.nextEdge.nextEdge.v.position;
 
-            //But we are looking at it from the back-side, 
+            //But we are looking at it from the back-side,
             //so we add those vertices counter-clock-wise to make the new triangles clock-wise
             convexHull.AddTriangle(p1_opposite, p3_opposite, p4);
             convexHull.AddTriangle(p3_opposite, p2_opposite, p4);
@@ -456,16 +456,16 @@ namespace Habrador_Computational_Geometry
         }
 
 
-       
+
         //Given points and a plane, find the point furthest away from the plane
-        private static MyVector3 FindPointFurthestAwayFromPlane(HashSet<MyVector3> points, Plane3 plane)
+        private static Vector3 FindPointFurthestAwayFromPlane(HashSet<Vector3> points, Plane3 plane)
         {
             //Cant init by picking the first point in a list because it might be co-planar
-            MyVector3 bestPoint = default;
+            Vector3 bestPoint = default;
 
             float bestDistance = -Mathf.Infinity;
 
-            foreach (MyVector3 p in points)
+            foreach (Vector3 p in points)
             {
                 float distance = _Geometry.GetSignedDistanceFromPointToPlane(p, plane);
 
@@ -495,23 +495,23 @@ namespace Habrador_Computational_Geometry
 
 
         //From a list of points, find the two points that are furthest away from each other
-        private static Edge3 FindEdgeFurthestApart(HashSet<MyVector3> pointsHashSet)
+        private static Edge3 FindEdgeFurthestApart(HashSet<Vector3> pointsHashSet)
         {
-            List<MyVector3> points = new List<MyVector3>(pointsHashSet);
+            List<Vector3> points = new List<Vector3>(pointsHashSet);
 
 
             //Instead of using all points, find the points on the AABB
-            MyVector3 maxX = points[0]; //Cant use default because default doesnt exist and might be a min point
-            MyVector3 minX = points[0];
-            MyVector3 maxY = points[0];
-            MyVector3 minY = points[0];
-            MyVector3 maxZ = points[0];
-            MyVector3 minZ = points[0];
+            Vector3 maxX = points[0]; //Cant use default because default doesnt exist and might be a min point
+            Vector3 minX = points[0];
+            Vector3 maxY = points[0];
+            Vector3 minY = points[0];
+            Vector3 maxZ = points[0];
+            Vector3 minZ = points[0];
 
             for (int i = 1; i < points.Count; i++)
             {
-                MyVector3 p = points[i];
-            
+                Vector3 p = points[i];
+
                 if (p.x > maxX.x)
                 {
                     maxX = p;
@@ -542,7 +542,7 @@ namespace Habrador_Computational_Geometry
 
             //Some of these might be the same point (like minZ and minY)
             //But we have earlier check that the points have a width greater than 0, so we should get the points we need
-            HashSet<MyVector3> extremePointsHashSet = new HashSet<MyVector3>();
+            HashSet<Vector3> extremePointsHashSet = new HashSet<Vector3>();
 
             extremePointsHashSet.Add(maxX);
             extremePointsHashSet.Add(minX);
@@ -551,7 +551,7 @@ namespace Habrador_Computational_Geometry
             extremePointsHashSet.Add(maxZ);
             extremePointsHashSet.Add(minZ);
 
-            points = new List<MyVector3>(extremePointsHashSet);
+            points = new List<Vector3>(extremePointsHashSet);
 
 
             //Find all possible combinations of edges between all points
@@ -559,11 +559,11 @@ namespace Habrador_Computational_Geometry
 
             for (int i = 0; i < points.Count; i++)
             {
-                MyVector3 p1 = points[i];
+                Vector3 p1 = points[i];
 
                 for (int j = i + 1; j < points.Count; j++)
                 {
-                    MyVector3 p2 = points[j];
+                    Vector3 p2 = points[j];
 
                     Edge3 e = new Edge3(p1, p2);
 
@@ -577,22 +577,23 @@ namespace Habrador_Computational_Geometry
             //Init by picking the first edge
             Edge3 eFurthestApart = pointCombinations[0];
 
-            float maxDistanceBetween = MyVector3.SqrDistance(eFurthestApart.p1, eFurthestApart.p2);
-
-            //Try to find a better edge
-            for (int i = 1; i < pointCombinations.Count; i++)
-            {
-                Edge3 e = pointCombinations[i];
-
-                float distanceBetween = MyVector3.SqrDistance(e.p1, e.p2);
-
-                if (distanceBetween > maxDistanceBetween)
-                {
-                    maxDistanceBetween = distanceBetween;
-
-                    eFurthestApart = e;
-                }
-            }
+            // float maxDistanceBetween = Vector3.SqrDistance(eFurthestApart.p1, eFurthestApart.p2);
+            //
+            //
+            // //Try to find a better edge
+            // for (int i = 1; i < pointCombinations.Count; i++)
+            // {
+            //     Edge3 e = pointCombinations[i];
+            //
+            //     float distanceBetween = Vector3.SqrDistance(e.p1, e.p2);
+            //
+            //     if (distanceBetween > maxDistanceBetween)
+            //     {
+            //         maxDistanceBetween = distanceBetween;
+            //
+            //         eFurthestApart = e;
+            //     }
+            // }
 
             return eFurthestApart;
         }
@@ -600,35 +601,35 @@ namespace Habrador_Computational_Geometry
 
 
         //Given an edge and a list of points, find the point furthest away from the edge
-        private static MyVector3 FindPointFurthestFromEdge(Edge3 edge, HashSet<MyVector3> pointsHashSet)
+        private static Vector3 FindPointFurthestFromEdge(Edge3 edge, HashSet<Vector3> pointsHashSet)
         {
-            List<MyVector3> points = new List<MyVector3>(pointsHashSet);
+            List<Vector3> points = new List<Vector3>(pointsHashSet);
 
             //Init with the first point
-            MyVector3 pointFurthestAway = points[0];
+            Vector3 pointFurthestAway = points[0];
 
-            MyVector3 closestPointOnLine = _Geometry.GetClosestPointOnLine(edge, pointFurthestAway, withinSegment: false);
-
-            float maxDistSqr = MyVector3.SqrDistance(pointFurthestAway, closestPointOnLine);
-
-            //Try to find a better point
-            for (int i = 1; i < points.Count; i++)
-            {
-                MyVector3 thisPoint = points[i];
-
-                //TODO make sure that thisPoint is NOT colinear with the edge because then we wont be able to build a triangle
-
-                closestPointOnLine = _Geometry.GetClosestPointOnLine(edge, thisPoint, withinSegment: false);
-
-                float distSqr = MyVector3.SqrDistance(thisPoint, closestPointOnLine);
-
-                if (distSqr > maxDistSqr)
-                {
-                    maxDistSqr = distSqr;
-
-                    pointFurthestAway = thisPoint;
-                }
-            }
+            // Vector3 closestPointOnLine = _Geometry.GetClosestPointOnLine(edge, pointFurthestAway, withinSegment: false);
+            //
+            // float maxDistSqr = Vector3.SqrDistance(pointFurthestAway, closestPointOnLine);
+            //
+            // //Try to find a better point
+            // for (int i = 1; i < points.Count; i++)
+            // {
+            //     Vector3 thisPoint = points[i];
+            //
+            //     //TODO make sure that thisPoint is NOT colinear with the edge because then we wont be able to build a triangle
+            //
+            //     closestPointOnLine = _Geometry.GetClosestPointOnLine(edge, thisPoint, withinSegment: false);
+            //
+            //     float distSqr = Vector3.SqrDistance(thisPoint, closestPointOnLine);
+            //
+            //     if (distSqr > maxDistSqr)
+            //     {
+            //         maxDistSqr = distSqr;
+            //
+            //         pointFurthestAway = thisPoint;
+            //     }
+            // }
 
 
             return pointFurthestAway;

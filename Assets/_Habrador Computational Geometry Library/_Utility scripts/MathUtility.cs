@@ -82,14 +82,14 @@ namespace Habrador_Computational_Geometry
         //In 3d space [radians]
         //https://stackoverflow.com/questions/5188561/signed-angle-between-two-3d-vectors-with-same-origin-within-the-same-plane
         //https://math.stackexchange.com/questions/2906314/how-to-calculate-angle-between-two-vectors-in-3d-with-clockwise-or-counter-clock
-        public static float AngleFromToCCW(MyVector3 from, MyVector3 to, MyVector3 upRef)
+        public static float AngleFromToCCW(Vector3 from, Vector3 to, Vector3 upRef)
         {
             //This is only working in 2d space
             //float angleDegrees = Quaternion.FromToRotation(to.ToVector3(), from.ToVector3()).eulerAngles.y;
 
-            from = MyVector3.Normalize(from);
-            to = MyVector3.Normalize(to);
-            upRef = MyVector3.Normalize(upRef);
+            from = Vector3.Normalize(from);
+            to = Vector3.Normalize(to);
+            upRef = Vector3.Normalize(upRef);
 
             float angleRad = AngleBetween(from, to, shouldNormalize: false);
 
@@ -98,9 +98,9 @@ namespace Habrador_Computational_Geometry
 
             //Remember that the cross product is not alwayspointing up - it can change to down depending on how the vectors are aligned
             //Which is why we need a fixed reference up
-            MyVector3 cross = MyVector3.Cross(from, to);
+            Vector3 cross = Vector3.Cross(from, to);
 
-            float determinant = MyVector3.Dot(MyVector3.Cross(from, to), upRef);
+            float determinant = Vector3.Dot(Vector3.Cross(from, to), upRef);
 
             //Debug.Log(determinant);
 
@@ -116,18 +116,18 @@ namespace Habrador_Computational_Geometry
 
         //The angle between two vectors 0 <= angle <= 180
         //Same as Vector3.Angle() but we are using MyVector3
-        public static float AngleBetween(MyVector3 from, MyVector3 to, bool shouldNormalize = true)
+        public static float AngleBetween(Vector3 from, Vector3 to, bool shouldNormalize = true)
         {
             //from and to should be normalized
             //But sometimes they are already normalized and then we dont need to do it again
             if (shouldNormalize)
             {
-                from = MyVector3.Normalize(from);
-                to = MyVector3.Normalize(to);
+                from = Vector3.Normalize(from);
+                to = Vector3.Normalize(to);
             }
 
             //dot(a_normalized, b_normalized) = cos(alpha) -> acos(dot(a_normalized, b_normalized)) = alpha
-            float dot = MyVector3.Dot(from, to);
+            float dot = Vector3.Dot(from, to);
 
             //This shouldn't happen but may happen because of floating point precision issues
             dot = Mathf.Clamp(dot, -1f, 1f);

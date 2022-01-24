@@ -11,7 +11,7 @@ namespace Habrador_Computational_Geometry
         public HalfEdge3 halfEdge;
 
         //Optimal contraction target position
-        public MyVector3 mergePosition;
+        public Vector3 mergePosition;
 
         //The Quadric Error Metric at the merge position
         public float qem;
@@ -44,12 +44,12 @@ namespace Habrador_Computational_Geometry
             //Add the other versions in the future!
             //Adding just 3 alternatives instead of using just the average position, adds 0.2 seconds for the bunny (2400 iterations)
             //But the result is slightly better
-            MyVector3 p1 = e.prevEdge.v.position;
-            MyVector3 p2 = e.v.position;
+            Vector3 p1 = e.prevEdge.v.position;
+            Vector3 p2 = e.v.position;
 
-            MyVector3 v1 = p1;
-            MyVector3 v2 = p2;
-            MyVector3 v3 = (p1 + p2) * 0.5f;
+            Vector3 v1 = p1;
+            Vector3 v2 = p2;
+            Vector3 v3 = (p1 + p2) * 0.5f;
 
             //Compute the Quadric Error Metric at each point v
             float qem1 = CalculateQEM(v1, Q1, Q2);
@@ -82,7 +82,7 @@ namespace Habrador_Computational_Geometry
         //Compute the Quadric Error Metric at point v
         //The error for v1, v2 is given by v^T * (Q1 + Q2) * v 
         //where v = [v.x, v.y, v.z, 1] is the optimal contraction target position
-        private float CalculateQEM(MyVector3 v, Matrix4x4 Q1, Matrix4x4 Q2)
+        private float CalculateQEM(Vector3 v, Matrix4x4 Q1, Matrix4x4 Q2)
         {
             //qem = v^T * (Q1 + Q2) * v
 
@@ -116,8 +116,8 @@ namespace Habrador_Computational_Geometry
         //Get the positions where this edge starts and end
         public Edge3 GetEdgeEndPoints()
         {
-            MyVector3 p1 = this.halfEdge.prevEdge.v.position;
-            MyVector3 p2 = this.halfEdge.v.position;
+            Vector3 p1 = this.halfEdge.prevEdge.v.position;
+            Vector3 p2 = this.halfEdge.v.position;
 
             Edge3 e = new Edge3(p1, p2);
 

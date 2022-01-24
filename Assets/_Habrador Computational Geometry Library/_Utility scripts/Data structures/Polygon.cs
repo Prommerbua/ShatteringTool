@@ -20,10 +20,10 @@ namespace Habrador_Computational_Geometry
     //Polygon in 3d space
     public struct Polygon3
     {
-        public List<MyVector3> vertices;
+        public List<Vector3> vertices;
 
 
-        public Polygon3(List<MyVector3> vertices)
+        public Polygon3(List<Vector3> vertices)
         {
             this.vertices = vertices;
         }

@@ -10,12 +10,12 @@ namespace Habrador_Computational_Geometry
     {
         private Quaternion unityQuaternion;
     
-        public MyQuaternion(MyVector3 forward)
+        public MyQuaternion(Vector3 forward)
         {
             this.unityQuaternion = Quaternion.LookRotation(forward.ToVector3());
         }
 
-        public MyQuaternion(MyVector3 forward, MyVector3 up)
+        public MyQuaternion(Vector3 forward, Vector3 up)
         {
             this.unityQuaternion = Quaternion.LookRotation(forward.ToVector3(), up.ToVector3());
         }
@@ -32,7 +32,7 @@ namespace Habrador_Computational_Geometry
         //
 
         //Rotate a quaternion some degrees around some axis
-        public static MyQuaternion RotateQuaternion(MyQuaternion oldQuaternion, float angleInDegrees, MyVector3 rotationAxis)
+        public static MyQuaternion RotateQuaternion(MyQuaternion oldQuaternion, float angleInDegrees, Vector3 rotationAxis)
         {        
             Quaternion rotationQuaternion = Quaternion.AngleAxis(angleInDegrees, rotationAxis.ToVector3());
 
@@ -48,16 +48,16 @@ namespace Habrador_Computational_Geometry
 
 
         //Rotate a vector by using a quaternion
-        public static MyVector3 RotateVector(MyQuaternion quat, MyVector3 vec)
+        public static Vector3 RotateVector(MyQuaternion quat, Vector3 vec)
         {
-            Vector3 rotatedVec = quat.unityQuaternion * vec.ToVector3();
+            UnityEngine.Vector3 rotatedVec = quat.unityQuaternion * vec.ToVector3();
 
             return rotatedVec.ToMyVector3();
         }
 
-        public MyVector3 RotateVector(MyVector3 vec)
+        public Vector3 RotateVector(Vector3 vec)
         {
-            Vector3 rotatedVec = unityQuaternion * vec.ToVector3();
+            UnityEngine.Vector3 rotatedVec = unityQuaternion * vec.ToVector3();
 
             return rotatedVec.ToMyVector3();
         }
@@ -69,8 +69,8 @@ namespace Habrador_Computational_Geometry
         //
 
         //If you multiply orientation with direction vector you will rotate the direction
-        public MyVector3 Forward => (unityQuaternion * Vector3.forward).ToMyVector3();
-        public MyVector3 Right   => (unityQuaternion * Vector3.right).ToMyVector3();
-        public MyVector3 Up      => (unityQuaternion * Vector3.up).ToMyVector3();
+        public Vector3 Forward => (unityQuaternion * UnityEngine.Vector3.forward).ToMyVector3();
+        public Vector3 Right   => (unityQuaternion * UnityEngine.Vector3.right).ToMyVector3();
+        public Vector3 Up      => (unityQuaternion * UnityEngine.Vector3.up).ToMyVector3();
     }
 }

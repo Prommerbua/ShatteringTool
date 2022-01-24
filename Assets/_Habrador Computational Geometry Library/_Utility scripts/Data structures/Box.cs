@@ -7,15 +7,15 @@ namespace Habrador_Computational_Geometry
     public class Box
     {
         //The corners
-        public MyVector3 topFR;
-        public MyVector3 topFL;
-        public MyVector3 topBR;
-        public MyVector3 topBL;
+        public Vector3 topFR;
+        public Vector3 topFL;
+        public Vector3 topBR;
+        public Vector3 topBL;
 
-        public MyVector3 bottomFR;
-        public MyVector3 bottomFL;
-        public MyVector3 bottomBR;
-        public MyVector3 bottomBL;
+        public Vector3 bottomFR;
+        public Vector3 bottomFL;
+        public Vector3 bottomBR;
+        public Vector3 bottomBL;
 
 
         //Generate a bounding box from a mesh in world space
@@ -25,24 +25,24 @@ namespace Habrador_Computational_Geometry
         {
             Bounds bounds = mesh.bounds;
 
-            Vector3 halfSize = bounds.extents;
+            UnityEngine.Vector3 halfSize = bounds.extents;
 
-            Vector3 xVec = Vector3.right * halfSize.x;
-            Vector3 yVec = Vector3.up * halfSize.y;
-            Vector3 zVec = Vector3.forward * halfSize.z;
+            UnityEngine.Vector3 xVec = UnityEngine.Vector3.right * halfSize.x;
+            UnityEngine.Vector3 yVec = UnityEngine.Vector3.up * halfSize.y;
+            UnityEngine.Vector3 zVec = UnityEngine.Vector3.forward * halfSize.z;
 
-            Vector3 top = bounds.center + yVec;
-            Vector3 bottom = bounds.center - yVec;
+            UnityEngine.Vector3 top = bounds.center + yVec;
+            UnityEngine.Vector3 bottom = bounds.center - yVec;
 
-            Vector3 topFR = top + zVec + xVec;
-            Vector3 topFL = top + zVec - xVec;
-            Vector3 topBR = top - zVec + xVec;
-            Vector3 topBL = top - zVec - xVec;
+            UnityEngine.Vector3 topFR = top + zVec + xVec;
+            UnityEngine.Vector3 topFL = top + zVec - xVec;
+            UnityEngine.Vector3 topBR = top - zVec + xVec;
+            UnityEngine.Vector3 topBL = top - zVec - xVec;
 
-            Vector3 bottomFR = bottom + zVec + xVec;
-            Vector3 bottomFL = bottom + zVec - xVec;
-            Vector3 bottomBR = bottom - zVec + xVec;
-            Vector3 bottomBL = bottom - zVec - xVec;
+            UnityEngine.Vector3 bottomFR = bottom + zVec + xVec;
+            UnityEngine.Vector3 bottomFL = bottom + zVec - xVec;
+            UnityEngine.Vector3 bottomBR = bottom - zVec + xVec;
+            UnityEngine.Vector3 bottomBL = bottom - zVec - xVec;
 
 
             //Local to world space
@@ -96,9 +96,9 @@ namespace Habrador_Computational_Geometry
 
 
         //Get all corners of the box
-        public HashSet<MyVector3> GetCorners()
+        public HashSet<Vector3> GetCorners()
         {
-            HashSet<MyVector3> corners = new HashSet<MyVector3>()
+            HashSet<Vector3> corners = new HashSet<Vector3>()
             {
                 topFR,
                 topFL,

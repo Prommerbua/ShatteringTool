@@ -9,10 +9,10 @@ namespace Habrador_Computational_Geometry
     public class BezierLinear : _Curve
     {
         //Start and end point
-        public MyVector3 posA;
-        public MyVector3 posB;
+        public Vector3 posA;
+        public Vector3 posB;
 
-        public BezierLinear(MyVector3 posA, MyVector3 posB)
+        public BezierLinear(Vector3 posA, Vector3 posB)
         {
             this.posA = posA;
             this.posB = posB;
@@ -24,16 +24,16 @@ namespace Habrador_Computational_Geometry
         // Position
         //
 
-        public override MyVector3 GetPosition(float t)
+        public override Vector3 GetPosition(float t)
         {
-            MyVector3 interpolatedPos = GetPosition(posA, posB, t);
+            Vector3 interpolatedPos = GetPosition(posA, posB, t);
 
             return interpolatedPos;
         }
 
         //Linear bezier - straight line
         //3d
-        public static MyVector3 GetPosition(MyVector3 a, MyVector3 b, float t)
+        public static Vector3 GetPosition(Vector3 a, Vector3 b, float t)
         {
             t = Mathf.Clamp01(t);
 
@@ -46,7 +46,7 @@ namespace Habrador_Computational_Geometry
             //Above is same as
             //(1-t)A + tB = A - At + Bt
 
-            MyVector3 interpolatedPos = a - a * t + b * t;
+            Vector3 interpolatedPos = a - a * t + b * t;
 
             return interpolatedPos;
         }
@@ -77,24 +77,24 @@ namespace Habrador_Computational_Geometry
 
         public override float GetDerivative(float t)
         {
-            MyVector3 derivativeVec = GetDerivativeVec(posA, posB);
+            Vector3 derivativeVec = GetDerivativeVec(posA, posB);
 
-            float derivative = MyVector3.Magnitude(derivativeVec);
+            float derivative = Vector3.Magnitude(derivativeVec);
 
             return derivative;
         }
 
-        public static MyVector3 GetDerivativeVec(MyVector3 posA, MyVector3 posB)
+        public static Vector3 GetDerivativeVec(Vector3 posA, Vector3 posB)
         {
             //Pos: A - At + Bt
             //Derivative: -A + B
 
-            MyVector3 derivativeVec = -posA + posB;
+            Vector3 derivativeVec = -posA + posB;
 
             return derivativeVec;
         }
 
-        public override MyVector3 GetSecondDerivativeVec(float t)
+        public override Vector3 GetSecondDerivativeVec(float t)
         {
             throw new System.NotImplementedException();
         }
@@ -104,7 +104,7 @@ namespace Habrador_Computational_Geometry
         // Tangent
         //
 
-        public override MyVector3 GetTangent(float t)
+        public override Vector3 GetTangent(float t)
         {
             throw new System.NotImplementedException();
         }

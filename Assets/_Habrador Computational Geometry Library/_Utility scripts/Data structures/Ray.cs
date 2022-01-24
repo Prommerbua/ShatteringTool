@@ -7,12 +7,12 @@ namespace Habrador_Computational_Geometry
     //3D
     public class Ray3
     {
-        public MyVector3 origin;
+        public Vector3 origin;
 
-        public MyVector3 dir;
+        public Vector3 dir;
 
 
-        public Ray3(MyVector3 origin, MyVector3 dir)
+        public Ray3(Vector3 origin, Vector3 dir)
         {
             this.origin = origin;
 

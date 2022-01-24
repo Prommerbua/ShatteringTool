@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using StarterAssets;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Shoot : MonoBehaviour
 {
@@ -13,27 +13,38 @@ public class Shoot : MonoBehaviour
 
     private float lastShot = -1000.0f;
 
+    private void Awake()
+    {
+        _input = new StarterAssetsInputs();
+    }
+
+    private void OnEnable()
+    {
+        _input.Enable();
+    }
+
+    private void OnDisable()
+    {
+        _input.Disable();
+    }
     // Start is called before the first frame update
     void Start()
     {
-        _input = GetComponent<StarterAssetsInputs>();
+        _input.Player.Shoot.started += ShootProjectile;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ShootProjectile(InputAction.CallbackContext obj)
     {
-        if (_input.shoot)
+        if (Time.time - lastShot >= MinDelay)
         {
-            if (Time.time - lastShot >= MinDelay)
-            {
-                lastShot = Time.time;
+            lastShot = Time.time;
 
-                var projectile = Instantiate(Projectile, SpawnLocation.position, transform.rotation);
+            var projectile = Instantiate(Projectile, SpawnLocation.position, transform.rotation);
 
-                projectile.GetComponent<Rigidbody>().velocity = InitialSpeed * Camera.main.transform.forward;
-            }
+            projectile.GetComponent<Rigidbody>().velocity = InitialSpeed * Camera.main.transform.forward;
+            Destroy(projectile, 3.0f);
         }
     }
 
-
+    // Update is called once per frame
 }

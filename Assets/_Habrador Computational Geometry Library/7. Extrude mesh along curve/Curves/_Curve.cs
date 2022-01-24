@@ -9,13 +9,13 @@ namespace Habrador_Computational_Geometry
     public abstract class _Curve
     {
         //All child classes need to have these methods
-        public abstract MyVector3 GetPosition(float t);
+        public abstract Vector3 GetPosition(float t);
 
         public abstract float GetDerivative(float t);
 
-        public abstract MyVector3 GetSecondDerivativeVec(float t);
+        public abstract Vector3 GetSecondDerivativeVec(float t);
 
-        public abstract MyVector3 GetTangent(float t);
+        public abstract Vector3 GetTangent(float t);
 
         //public abstract InterpolationTransform GetTransform(float t);
     }

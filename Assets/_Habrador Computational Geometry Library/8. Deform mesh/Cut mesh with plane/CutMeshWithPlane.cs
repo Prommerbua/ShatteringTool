@@ -52,12 +52,12 @@ namespace Habrador_Computational_Geometry
                 AABB3 aabb = new AABB3(mr.bounds);
 
                 //The corners of this box 
-                HashSet<MyVector3> corners = aabb.GetCorners();
+                HashSet<Vector3> corners = aabb.GetCorners();
 
                 if (corners != null && corners.Count > 1)
                 {
                     //The points are in world space so use the plane in world space
-                    if (ArePointsOnOneSideOfPlane(new List<MyVector3>(corners), cutPlaneGlobal))
+                    if (ArePointsOnOneSideOfPlane(new List<Vector3>(corners), cutPlaneGlobal))
                     {
                         Debug.Log("This mesh can't be cut because its AABB doesnt intersect with the plane");
                     
@@ -74,9 +74,9 @@ namespace Habrador_Computational_Geometry
             HalfEdgeData3 newMeshI = new HalfEdgeData3();
 
             //The data belonging to the original mesh
-            Vector3[] vertices = mesh.vertices;
+            UnityEngine.Vector3[] vertices = mesh.vertices;
             int[] triangles = mesh.triangles;
-            Vector3[] normals = mesh.normals;
+            UnityEngine.Vector3[] normals = mesh.normals;
 
             //Save the new edges we add when cutting triangles that intersects with the plane
             //Need to be edges so we can later connect them with each other to fill the hole
@@ -86,8 +86,8 @@ namespace Habrador_Computational_Geometry
 
 
             //Transform the plane from global space to local space of the mesh
-            MyVector3 planePosLocal = meshTrans.InverseTransformPoint(cutPlaneGlobal.pos.ToVector3()).ToMyVector3();
-            MyVector3 planeNormalLocal = meshTrans.InverseTransformDirection(cutPlaneGlobal.normal.ToVector3()).ToMyVector3();
+            Vector3 planePosLocal = meshTrans.InverseTransformPoint(cutPlaneGlobal.pos.ToVector3()).ToMyVector3();
+            Vector3 planeNormalLocal = meshTrans.InverseTransformDirection(cutPlaneGlobal.normal.ToVector3()).ToMyVector3();
 
             Plane3 cutPlane = new Plane3(planePosLocal, planeNormalLocal);
 
@@ -101,18 +101,18 @@ namespace Habrador_Computational_Geometry
                 int triangleIndex3 = triangles[i + 2];
 
                 //Positions
-                Vector3 p1_unity = vertices[triangleIndex1];
-                Vector3 p2_unity = vertices[triangleIndex2];
-                Vector3 p3_unity = vertices[triangleIndex3];
+                UnityEngine.Vector3 p1_unity = vertices[triangleIndex1];
+                UnityEngine.Vector3 p2_unity = vertices[triangleIndex2];
+                UnityEngine.Vector3 p3_unity = vertices[triangleIndex3];
 
-                MyVector3 p1 = p1_unity.ToMyVector3();
-                MyVector3 p2 = p2_unity.ToMyVector3();
-                MyVector3 p3 = p3_unity.ToMyVector3();
+                Vector3 p1 = p1_unity.ToMyVector3();
+                Vector3 p2 = p2_unity.ToMyVector3();
+                Vector3 p3 = p3_unity.ToMyVector3();
 
                 //Normals
-                MyVector3 n1 = normals[triangleIndex1].ToMyVector3();
-                MyVector3 n2 = normals[triangleIndex2].ToMyVector3();
-                MyVector3 n3 = normals[triangleIndex3].ToMyVector3();
+                Vector3 n1 = normals[triangleIndex1].ToMyVector3();
+                Vector3 n2 = normals[triangleIndex2].ToMyVector3();
+                Vector3 n3 = normals[triangleIndex3].ToMyVector3();
 
                 //To make it easier to send data to methods
                 MyMeshVertex v1 = new MyMeshVertex(p1, n1);
@@ -390,7 +390,7 @@ namespace Habrador_Computational_Geometry
 
 
         //Fill the hole (or holes) in the mesh
-        private static HashSet<Hole> FillHoles(HashSet<HalfEdge3> holeEdgesI, HashSet<HalfEdge3> holeEdgesO, OrientedPlane3 orientedCutPlane, Transform meshTrans, MyVector3 planeNormal)
+        private static HashSet<Hole> FillHoles(HashSet<HalfEdge3> holeEdgesI, HashSet<HalfEdge3> holeEdgesO, OrientedPlane3 orientedCutPlane, Transform meshTrans, Vector3 planeNormal)
         {
             if (holeEdgesI == null || holeEdgesI.Count == 0)
             {
@@ -436,13 +436,13 @@ namespace Habrador_Computational_Geometry
 
                 foreach (HalfEdge3 e in hole)
                 {
-                    MyVector3 pMeshSpace = e.v.position;
+                    Vector3 pMeshSpace = e.v.position;
 
                     //Mesh space to Global space
-                    Vector3 pGlobalSpace = meshTrans.TransformPoint(pMeshSpace.ToVector3());
+                    UnityEngine.Vector3 pGlobalSpace = meshTrans.TransformPoint(pMeshSpace.ToVector3());
 
                     //Global space to Plane space
-                    Vector3 pPlaneSpace = planeTrans.InverseTransformPoint(pGlobalSpace);
+                    UnityEngine.Vector3 pPlaneSpace = planeTrans.InverseTransformPoint(pGlobalSpace);
 
                     //Y is normal direction so should be 0
                     MyVector2 p2D = new MyVector2(pPlaneSpace.x, pPlaneSpace.z);
@@ -460,19 +460,19 @@ namespace Habrador_Computational_Geometry
                 foreach (Triangle2 t in triangles)
                 {
                     //3d space
-                    Vector3 p1 = new Vector3(t.p1.x, 0f, t.p1.y);
-                    Vector3 p2 = new Vector3(t.p2.x, 0f, t.p2.y);
-                    Vector3 p3 = new Vector3(t.p3.x, 0f, t.p3.y);
+                    UnityEngine.Vector3 p1 = new UnityEngine.Vector3(t.p1.x, 0f, t.p1.y);
+                    UnityEngine.Vector3 p2 = new UnityEngine.Vector3(t.p2.x, 0f, t.p2.y);
+                    UnityEngine.Vector3 p3 = new UnityEngine.Vector3(t.p3.x, 0f, t.p3.y);
 
                     //Plane space to Global space
-                    Vector3 p1Global = planeTrans.TransformPoint(p1);
-                    Vector3 p2Global = planeTrans.TransformPoint(p2);
-                    Vector3 p3Global = planeTrans.TransformPoint(p3);
+                    UnityEngine.Vector3 p1Global = planeTrans.TransformPoint(p1);
+                    UnityEngine.Vector3 p2Global = planeTrans.TransformPoint(p2);
+                    UnityEngine.Vector3 p3Global = planeTrans.TransformPoint(p3);
 
                     //Global space to Mesh space
-                    Vector3 p1Mesh = meshTrans.InverseTransformPoint(p1Global);
-                    Vector3 p2Mesh = meshTrans.InverseTransformPoint(p2Global);
-                    Vector3 p3Mesh = meshTrans.InverseTransformPoint(p3Global);
+                    UnityEngine.Vector3 p1Mesh = meshTrans.InverseTransformPoint(p1Global);
+                    UnityEngine.Vector3 p2Mesh = meshTrans.InverseTransformPoint(p2Global);
+                    UnityEngine.Vector3 p3Mesh = meshTrans.InverseTransformPoint(p3Global);
 
                     //For inside mesh
                     MyMeshVertex v1_I = new MyMeshVertex(p1Mesh.ToMyVector3(), planeNormal);
@@ -496,13 +496,13 @@ namespace Habrador_Computational_Geometry
                 //But we also need an edge for the Outside mesh
                 bool foundCorrespondingEdge = false;
 
-                MyVector3 eGoingTo = holeEdgeI.v.position;
-                MyVector3 eGoingFrom = holeEdgeI.prevEdge.v.position;
+                Vector3 eGoingTo = holeEdgeI.v.position;
+                Vector3 eGoingFrom = holeEdgeI.prevEdge.v.position;
 
                 foreach (HalfEdge3 holeEdgeO in holeEdgesO)
                 {
-                    MyVector3 eOppsiteGoingTo = holeEdgeO.v.position;
-                    MyVector3 eOppsiteGoingFrom = holeEdgeO.prevEdge.v.position;
+                    Vector3 eOppsiteGoingTo = holeEdgeO.v.position;
+                    Vector3 eOppsiteGoingFrom = holeEdgeO.prevEdge.v.position;
 
                     if (eOppsiteGoingTo.Equals(eGoingFrom) && eOppsiteGoingFrom.Equals(eGoingTo))
                     {
@@ -557,7 +557,7 @@ namespace Habrador_Computational_Geometry
                 //Find an edge that starts at the last sorted cut edge
                 HalfEdge3 nextEdge = null;
 
-                MyVector3 lastPos = sortedHoleEdges[sortedHoleEdges.Count - 1].v.position;
+                Vector3 lastPos = sortedHoleEdges[sortedHoleEdges.Count - 1].v.position;
 
                 foreach (HalfEdge3 e in cutEdges)
                 {
@@ -641,21 +641,21 @@ namespace Habrador_Computational_Geometry
             Edge3 e_I2O1 = new Edge3(I2.position, O1.position);
 
             //The positions of the intersection vertices
-            MyVector3 pos_O1I1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_O1I1);
-            MyVector3 pos_I2O1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_I2O1);
+            Vector3 pos_O1I1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_O1I1);
+            Vector3 pos_I2O1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_I2O1);
 
             //The normals of the intersection vertices
-            float percentageBetween_O1I1 = MyVector3.Distance(O1.position, pos_O1I1) / MyVector3.Distance(O1.position, I1.position);
-            float percentageBetween_I2O1 = MyVector3.Distance(I2.position, pos_I2O1) / MyVector3.Distance(I2.position, O1.position);
+            float percentageBetween_O1I1 = Vector3.Distance(O1.position, pos_O1I1) / Vector3.Distance(O1.position, I1.position);
+            float percentageBetween_I2O1 = Vector3.Distance(I2.position, pos_I2O1) / Vector3.Distance(I2.position, O1.position);
 
-            MyVector3 normal_O1I1 = _Interpolation.Lerp(O1.normal, I1.normal, percentageBetween_O1I1);
-            MyVector3 normal_I2O1 = _Interpolation.Lerp(I2.normal, O1.normal, percentageBetween_I2O1);
+            Vector3 normal_O1I1 = _Interpolation.Lerp(O1.normal, I1.normal, percentageBetween_O1I1);
+            Vector3 normal_I2O1 = _Interpolation.Lerp(I2.normal, O1.normal, percentageBetween_I2O1);
 
             //MyVector3 normal_F1B1 = Vector3.Slerp(F1.normal.ToVector3(), B1.normal.ToVector3(), percentageBetween_F1B1).ToMyVector3();
             //MyVector3 normal_B2F1 = Vector3.Slerp(B2.normal.ToVector3(), F1.normal.ToVector3(), percentageBetween_B2F1).ToMyVector3();
 
-            normal_O1I1 = MyVector3.Normalize(normal_O1I1);
-            normal_I2O1 = MyVector3.Normalize(normal_I2O1);
+            normal_O1I1 = Vector3.Normalize(normal_O1I1);
+            normal_I2O1 = Vector3.Normalize(normal_I2O1);
 
             //The intersection vertices
             MyMeshVertex v_O1I1 = new MyMeshVertex(pos_O1I1, normal_O1I1);
@@ -684,21 +684,21 @@ namespace Habrador_Computational_Geometry
             Edge3 e_I1O1 = new Edge3(I1.position, O1.position);
 
             //The positions of the intersection vertices
-            MyVector3 pos_O2I1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_O2I1);
-            MyVector3 pos_I1O1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_I1O1);
+            Vector3 pos_O2I1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_O2I1);
+            Vector3 pos_I1O1 = _Intersections.GetLinePlaneIntersectionPoint(cutPlane, e_I1O1);
 
             //The normals of the intersection vertices
-            float percentageBetween_O2I1 = MyVector3.Distance(O2.position, pos_O2I1) / MyVector3.Distance(O2.position, I1.position);
-            float percentageBetween_I1O1 = MyVector3.Distance(I1.position, pos_I1O1) / MyVector3.Distance(I1.position, O1.position);
+            float percentageBetween_O2I1 = Vector3.Distance(O2.position, pos_O2I1) / Vector3.Distance(O2.position, I1.position);
+            float percentageBetween_I1O1 = Vector3.Distance(I1.position, pos_I1O1) / Vector3.Distance(I1.position, O1.position);
 
-            MyVector3 normal_O2I1 = _Interpolation.Lerp(O2.normal, I1.normal, percentageBetween_O2I1);
-            MyVector3 normal_I1O1 = _Interpolation.Lerp(I1.normal, O1.normal, percentageBetween_I1O1);
+            Vector3 normal_O2I1 = _Interpolation.Lerp(O2.normal, I1.normal, percentageBetween_O2I1);
+            Vector3 normal_I1O1 = _Interpolation.Lerp(I1.normal, O1.normal, percentageBetween_I1O1);
 
             //MyVector3 normal_F2B1 = Vector3.Slerp(F2.normal.ToVector3(), B1.normal.ToVector3(), percentageBetween_F2B1).ToMyVector3();
             //MyVector3 normal_B1F1 = Vector3.Slerp(B1.normal.ToVector3(), F1.normal.ToVector3(), percentageBetween_B1F1).ToMyVector3();
 
-            normal_O2I1 = MyVector3.Normalize(normal_O2I1);
-            normal_I1O1 = MyVector3.Normalize(normal_I1O1);
+            normal_O2I1 = Vector3.Normalize(normal_O2I1);
+            normal_I1O1 = Vector3.Normalize(normal_I1O1);
 
             //The intersection vertices
             MyMeshVertex v_O2I1 = new MyMeshVertex(pos_O2I1, normal_O2I1);
@@ -782,7 +782,7 @@ namespace Habrador_Computational_Geometry
 
 
         //Is a list of points on one side of a plane?
-        public static bool ArePointsOnOneSideOfPlane(List<MyVector3> points, Plane3 plane)
+        public static bool ArePointsOnOneSideOfPlane(List<Vector3> points, Plane3 plane)
         {        
             //First check the first point
             bool isInFront = _Geometry.IsPointOutsidePlane(points[0], plane);
