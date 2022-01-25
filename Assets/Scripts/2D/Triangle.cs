@@ -1,31 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Visualization2D
 {
     public class Triangle
     {
-        public Vector2 V1;
-        public Vector2 V2;
-        public Vector2 V3;
+        public Vector2 V1 => points[0];
+        public Vector2 V2 => points[1];
+        public Vector2 V3 => points[2];
 
-        public Edge E1;
-        public Edge E2;
-        public Edge E3;
+        private Vector2[] points;
+
 
         public Vector2 Circumcenter;
         public float Radius;
 
         public Triangle(Vector2 v1, Vector2 v2, Vector2 v3)
         {
-            this.V1 = v1;
-            this.V2 = v2;
-            this.V3 = v3;
-
-            E1 = new Edge(V1, V2);
-            E2 = new Edge(V2, V3);
-            E3 = new Edge(V3, V1);
+            points = new[] {v1, v2, v3};
+            CalculateCircumcenter();
         }
 
         public Vector2 CalculateCircumcenter()
@@ -52,45 +47,19 @@ namespace Visualization2D
             return c;
         }
 
+        public bool HasVertex(Vector2 vertex)
+        {
+            return points.Contains(vertex);
+        }
+
         public bool IsPointInsideCircumcircle(Vector2 point)
         {
-            var length = (Circumcenter - point).magnitude;
-            return Radius - length > 0;
+            return Radius >= (point - Circumcenter).magnitude;
         }
 
-        public List<Edge> GetEdges()
+        public Edge[] GetEdges()
         {
-            List<Edge> edges = new List<Edge>();
-
-            edges.Add(E1);
-            edges.Add(E2);
-            edges.Add(E3);
-            return edges;
-        }
-
-        public List<Vector2> GetVertices()
-        {
-            List<Vector2> vertices = new List<Vector2>();
-
-            vertices.Add(V1);
-            vertices.Add(V2);
-            vertices.Add(V3);
-            return vertices;
-        }
-
-        public bool HasSharedEdge(Triangle other)
-        {
-            bool shared = false;
-            foreach (var edge in GetEdges())
-            {
-                if (edge == other.E1 || edge == other.E2 || edge == other.E3)
-                {
-                    shared = true;
-                    break;
-                }
-            }
-
-            return shared;
+            return new[] {new Edge(V1, V2), new Edge(V2, V3), new Edge(V3, V1)};
         }
     }
 }

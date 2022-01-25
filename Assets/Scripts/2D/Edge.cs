@@ -1,40 +1,28 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Visualization2D
 {
 
 
-    public class Edge : IEquatable<Edge>
+    public class Edge
     {
-        public Vector2 Start;
-        public Vector2 End;
+        public Vector2 Start => points[0];
+        public Vector2 End  => points[1];
+
+        private Vector2[] points;
 
         public Edge(Vector2 start, Vector2 end)
         {
-            Start = start;
-            End = end;
-        }
-
-        public static bool operator ==(Edge e1, Edge e2)
-        {
-            if (e1.End == e2.End && e1.Start == e2.Start) return true;
-            else if (e1.Start == e2.End && e1.End == e2.Start) return true;
-            else return false;
-        }
-
-        public static bool operator !=(Edge e1, Edge e2)
-        {
-            return !(e1 == e2);
+            points = new[] {start, end};
         }
 
         public bool Equals(Edge other)
         {
-            if (End == other.End && Start == other.Start) return true;
-            else if (Start == other.End && End == other.Start) return true;
-            else return false;
+            return !(points.Except(other.points).Any());
         }
     }
 }
