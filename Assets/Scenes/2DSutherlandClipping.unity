@@ -229,36 +229,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 854619673}
-  - component: {fileID: 854619672}
+  - component: {fileID: 854619674}
   m_Layer: 0
-  m_Name: DelaunayTriangulation
+  m_Name: Sutherland
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &854619672
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 854619671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 397f7424e7c149541ba2e809e34beba3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pointRadius: 0.5
-  pointColor: {r: 1, g: 0, b: 0, a: 1}
-  delaunayLineColor: {r: 1, g: 1, b: 1, a: 1}
-  drawTriangleNumbers: 0
-  drawDelaunay: 0
-  drawVoronoi: 1
-  drawCircumcenter: 0
-  width: 100
-  height: 50
-  pointCount: 30
 --- !u!4 &854619673
 Transform:
   m_ObjectHideFlags: 0
@@ -273,6 +251,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &854619674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854619671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dc1ed801f1d29d4fbf80e50301632a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 100
+  height: 50
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,7 +342,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 50, y: 25, z: -10}
+  m_LocalPosition: {x: 27.5, y: 13.7, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 44934213}

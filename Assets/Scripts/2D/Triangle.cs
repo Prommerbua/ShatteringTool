@@ -7,25 +7,25 @@ namespace Visualization2D
 {
     public class Triangle
     {
-        public Vector2 V1 => points[0];
-        public Vector2 V2 => points[1];
-        public Vector2 V3 => points[2];
+        public Vector3 V1 => points[0];
+        public Vector3 V2 => points[1];
+        public Vector3 V3 => points[2];
 
-        private Vector2[] points;
+        private Vector3[] points;
 
 
-        public Vector2 Circumcenter;
+        public Vector3 Circumcenter;
         public float Radius;
 
-        public Triangle(Vector2 v1, Vector2 v2, Vector2 v3)
+        public Triangle(Vector3 v1, Vector3 v2, Vector3 v3)
         {
             points = new[] {v1, v2, v3};
             CalculateCircumcenter();
         }
 
-        public Vector2 CalculateCircumcenter()
+        public void CalculateCircumcenter()
         {
-            var A = Vector2.zero;
+            var A = Vector3.zero;
             var B = V2 - V1;
             var C = V3 - V1;
 
@@ -34,27 +34,54 @@ namespace Visualization2D
             var Ux = (C.y * (B.x * B.x + B.y * B.y) - B.y * (C.x * C.x + C.y * C.y)) / D;
             var Uy = (B.x * (C.x * C.x + C.y * C.y) - C.x * (B.x * B.x + B.y * B.y)) / D;
 
-            Circumcenter = new Vector2(Ux, Uy) + V1;
-            Radius = new Vector2(Ux, Uy).magnitude;
+            Circumcenter = new Vector3(Ux, Uy) + V1;
+            Radius = new Vector3(Ux, Uy).magnitude;
 
+            // var edges = GetEdges();
+            //
+            // Edge a = edges[0];
+            // Edge b = edges[1];
+            // float x = 0, y = 0;
+            // if (float.IsInfinity(a.f))
+            // {
+            //     x = a.Mid.x;
+            //     y = b.f * x + b.g;
+            // }
+            // else if (double.IsInfinity(b.f))
+            // {
+            //     x = b.Mid.x;
+            //     y = a.f * x + a.g;
+            // }
+            // else
+            // {
+            //     x = (b.g - a.g) / (a.f - b.f);
+            //     y = b.f * x + b.g;
+            // }
+            //
+            // Circumcenter = new Vector3(x, y);
+            // Radius = (new Vector3(V1.x, V2.y) - Circumcenter).magnitude;
 
-            return new Vector2(Ux, Uy) + V1;
         }
 
-        public Vector2 CalculateCentroidPosition()
+        public Vector3 CalculateCentroidPosition()
         {
             var c = (V1 + V2 + V3) / 3;
             return c;
         }
 
-        public bool HasVertex(Vector2 vertex)
+        public bool HasVertex(Vector3 vertex)
         {
             return points.Contains(vertex);
         }
 
-        public bool IsPointInsideCircumcircle(Vector2 point)
+        public bool IsPointInsideCircumcircle(Vector3 point)
         {
-            return Radius >= (point - Circumcenter).magnitude;
+            return Radius - (point - Circumcenter).magnitude > 0;
+        }
+
+        public Vector3[] GetVertices()
+        {
+            return points;
         }
 
         public Edge[] GetEdges()

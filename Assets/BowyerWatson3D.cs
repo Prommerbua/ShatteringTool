@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Habrador_Computational_Geometry;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -13,7 +12,14 @@ public class BowyerWatson3D : MonoBehaviour
     List<Tetraeder> triangulation = new List<Tetraeder>();
     List<Vector3> points = new List<Vector3>();
     List<VoronoiFace> voronoiFaces = new List<VoronoiFace>();
+    List<VoronoiCell> voronoiCells = new List<VoronoiCell>();
     private Tetraeder supertetra;
+
+
+    //List<Vector3> voronoiVertices = new List<Vector3>();
+
+
+    List<(Vector3, Vector3)> planes = new List<(Vector3, Vector3)>();
 
 
     [SerializeField] private int pointCount = 10;
@@ -52,19 +58,23 @@ public class BowyerWatson3D : MonoBehaviour
         //points.AddRange(meshFilter.mesh.vertices.Distinct().Select(x => transform.TransformPoint(x)));
 
 
-
         stopWatch.Start();
         StartAlgorithm();
+        stopWatch.Stop();
+        Debug.Log("Bowyer Watson Calculation: " + stopWatch.Elapsed);
+
+        stopWatch.Restart();
         CreateVoronoi();
         stopWatch.Stop();
-        Debug.Log("Voronoi Calculation: " + stopWatch.Elapsed);
+        Debug.Log("Voronoi Conversion: " + stopWatch.Elapsed);
 
+        stopWatch.Restart();
         VoronoiToMesh();
+        stopWatch.Stop();
+        Debug.Log("Mesh Creation: " + stopWatch.Elapsed);
 
-
-        CutMesh(meshToCut);
+        //CutMesh(meshToCut);
     }
-
 
 
     private void StartAlgorithm()
@@ -131,12 +141,11 @@ public class BowyerWatson3D : MonoBehaviour
         foreach (var point in points)
         {
             var neighbors = triangulation.Where(t => t.HasVertex(point));
+            //var neighbors = triangulation;
 
-            List<Vector3> circumcenter = new List<Vector3>();
             List<Vector3> neighborVertices = new List<Vector3>();
             foreach (var tetraeder in neighbors)
             {
-                circumcenter.Add(tetraeder.circumcenter);
                 neighborVertices.Add(tetraeder.p1);
                 neighborVertices.Add(tetraeder.p2);
                 neighborVertices.Add(tetraeder.p3);
@@ -153,6 +162,14 @@ public class BowyerWatson3D : MonoBehaviour
 
                 Plane p = new Plane(dir, mid);
 
+                //planes.Add((mid, dir));
+
+
+                // var planeGO = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                // var q = Quaternion.FromToRotation(Vector3.up, p.normal);
+                // planeGO.transform.SetPositionAndRotation(mid, q);
+
+
                 List<Vector3> VoronoiVertices = new List<Vector3>();
                 foreach (var tetraeder in neighbors)
                 {
@@ -162,18 +179,69 @@ public class BowyerWatson3D : MonoBehaviour
                     }
                 }
 
-                var face = new VoronoiFace(VoronoiVertices);
+                var face = new VoronoiFace(VoronoiVertices.ToList(), p);
                 voronoiFaces.Add(face);
             }
+
+            voronoiCells.Add(new VoronoiCell(point, voronoiFaces.ToList()));
+            voronoiFaces.Clear();
         }
     }
 
 
     private void VoronoiToMesh()
     {
-        foreach (var voronoiFace in voronoiFaces)
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        var normals = new List<Vector3>();
+        List<Vector3> meshVertices = new List<Vector3>();
+
+        foreach (var voronoiCell in voronoiCells)
         {
-            var bw = new BowyerWatson2D(voronoiFace.points);
+            vertices.Clear();
+            triangles.Clear();
+            normals.Clear();
+
+            foreach (var voronoiFace in voronoiCell.Faces)
+            {
+                var bw = new BowyerWatson2D(voronoiFace.points, voronoiFace.Plane);
+                meshVertices.Clear();
+                foreach (var triangle in bw.Triangulation)
+                {
+                    meshVertices.Add(triangle.V1);
+                    meshVertices.Add(triangle.V2);
+                    meshVertices.Add(triangle.V3);
+
+                    if ((Vector3.Cross(meshVertices[1] - meshVertices[0], meshVertices[2] - meshVertices[0]).normalized +
+                         voronoiFace.Plane.normal).sqrMagnitude < 2)
+                    {
+                        meshVertices.Reverse();
+                    }
+
+                    vertices.AddRange(meshVertices.ToList());
+                    //voronoiVertices.AddRange(meshVertices.ToList());
+
+
+                    triangles.Add(vertices.Count - 1);
+                    triangles.Add(vertices.Count - 3);
+                    triangles.Add(vertices.Count - 2);
+                    normals.Add(voronoiFace.Plane.normal);
+                    normals.Add(voronoiFace.Plane.normal);
+                    normals.Add(voronoiFace.Plane.normal);
+                }
+            }
+
+            var mesh = new Mesh();
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+            mesh.RecalculateNormals();
+
+            var go = new GameObject();
+            go.AddComponent<MeshFilter>().mesh = mesh;
+            go.AddComponent<MeshCollider>().sharedMesh = mesh;
+            go.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+
+            //go.transform.position = voronoiCell.Generator;
         }
     }
 
@@ -190,121 +258,29 @@ public class BowyerWatson3D : MonoBehaviour
             {
                 Vector3 currentPoint = inputList[i];
                 Vector3 prevPoint = inputList[(i - 1) % inputList.Count];
-
-
             }
-        }
-    }
-
-    public static bool IsTriangleOrientedClockwise(Vector2 p1, Vector2 p2, Vector2 p3)
-    {
-        bool isClockWise = true;
-
-        float determinant = p1.x * p2.y + p3.x * p1.y + p2.x * p3.y - p1.x * p3.y - p3.x * p2.y - p2.x * p1.y;
-
-        if (determinant > 0f)
-        {
-            isClockWise = false;
-        }
-
-        return isClockWise;
-    }
-
-
-
-    struct Tetraeder
-    {
-        public Vector3 p1 => points[0];
-        public Vector3 p2 => points[1];
-        public Vector3 p3 => points[2];
-        public Vector3 p4 => points[3];
-
-        private Vector3[] points;
-
-        public bool isBad;
-
-        public Vector3 circumcenter;
-        public float radius;
-
-        public Tetraeder(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4) : this()
-        {
-            points = new[] {p1, p2, p3, p4};
-
-            calculateCircumsphere();
-        }
-
-        private void calculateCircumsphere()
-        {
-            Vector3 v1 = p2 - p1;
-            Vector3 v2 = p3 - p1;
-            Vector3 v3 = p4 - p1;
-
-            float l1 = v1.sqrMagnitude;
-            float l2 = v2.sqrMagnitude;
-            float l3 = v3.sqrMagnitude;
-            circumcenter = p1 + (l1 * Vector3.Cross(v2, v3) + l2 * Vector3.Cross(v3, v1) + l3 * Vector3.Cross(v1, v2)) /
-                (2 * Vector3.Dot(v1, Vector3.Cross(v2, v3)));
-            radius = (p1 - circumcenter).magnitude;
-            // circumcenter = circumcenter * 1000;
-            // circumcenter = new Vector3((int) circumcenter.x / 1000.0f, (int) circumcenter.y / 1000.0f, (int) circumcenter.z / 1000.0f);
-        }
-
-        public Face[] GetFaces()
-        {
-            return new[] {new Face(p1, p2, p3), new Face(p2, p3, p4), new Face(p3, p4, p1), new Face(p4, p1, p2)};
-        }
-
-        public bool HasVertex(Vector3 vertex)
-        {
-            return points.Contains(vertex);
-        }
-
-        public bool IsPointInsideCircumSphere(Vector3 point)
-        {
-            return radius >= (point - circumcenter).magnitude;
-        }
-    }
-
-    struct VoronoiFace
-    {
-        public List<Vector3> points;
-
-
-        public VoronoiFace(List<Vector3> points)
-        {
-            this.points = points;
-        }
-    }
-
-    struct Face
-    {
-        private Vector3[] points;
-
-        public Vector3 p1 => points[0];
-        public Vector3 p2 => points[1];
-        public Vector3 p3 => points[2];
-
-        public Face(Vector3 p1, Vector3 p2, Vector3 p3)
-        {
-            points = new[] {p1, p2, p3};
-        }
-
-        public bool Equals(Face other)
-        {
-            return !(points.Except(other.points).Any());
         }
     }
 
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
         if (triangulation != null)
         {
             if (drawDelaunay)
             {
                 for (int i = 0; i < triangulation.Count; i++)
                 {
+                    Gizmos.color = Color.red;
+                    foreach (var vector3 in points.Except(triangulation[i].GetVertices()))
+                    {
+                        if (triangulation[i].IsPointInsideCircumSphere(vector3))
+                        {
+                            Gizmos.color = Color.blue;
+                        }
+                    }
+
+
                     Gizmos.DrawLine(triangulation[i].p1, triangulation[i].p2);
                     Gizmos.DrawLine(triangulation[i].p1, triangulation[i].p3);
                     Gizmos.DrawLine(triangulation[i].p1, triangulation[i].p4);
@@ -323,7 +299,7 @@ public class BowyerWatson3D : MonoBehaviour
             {
                 foreach (var tetraeder in triangulation)
                 {
-                    Gizmos.DrawSphere(tetraeder.circumcenter, 5f);
+                    Gizmos.DrawSphere(tetraeder.circumcenter, 0.1f);
                 }
             }
         }
@@ -336,22 +312,44 @@ public class BowyerWatson3D : MonoBehaviour
         //     Gizmos.DrawSphere(points[i], 1f);
         // }
 
+        // Gizmos.color = Color.green;
+        // if (voronoiVertices != null)
+        // {
+        //     foreach (var vertex in voronoiVertices)
+        //     {
+        //         Gizmos.DrawSphere(vertex, 0.1f);
+        //     }
+        // }
+
+        // Gizmos.color = Color.red;
+        // if (planes != null)
+        // {
+        //     foreach (var (mid, dir) in planes)
+        //     {
+        //         Gizmos.DrawSphere(mid, 0.05f);
+        //         Gizmos.DrawRay(mid, dir);
+        //     }
+        // }
+
 
         Gizmos.color = Color.magenta;
         if (voronoiFaces != null)
         {
             if (drawVoronoi)
             {
-                foreach (var voronoiFace in voronoiFaces)
+                foreach (var voronoiCell in voronoiCells)
                 {
-                    for (var index = 0; index < voronoiFace.points.Count; index++)
+                    foreach (var voronoiFace in voronoiCell.Faces)
                     {
-                        var point = voronoiFace.points[index];
-                        Vector3 point2 = Vector3.one;
-                        if (index == voronoiFace.points.Count - 1) point2 = voronoiFace.points[0];
-                        else point2 = voronoiFace.points[index + 1];
+                        for (int i = 0; i < voronoiFace.points.Count; i++)
+                        {
+                            var p1 = voronoiFace.points[i];
+                            Vector3 p2 = Vector3.zero;
+                            if (i + 1 < voronoiFace.points.Count) p2 = voronoiFace.points[i + 1];
+                            else p2 = voronoiFace.points[0];
 
-                        Gizmos.DrawLine(point, point2);
+                            Gizmos.DrawLine(p1, p2);
+                        }
                     }
                 }
             }

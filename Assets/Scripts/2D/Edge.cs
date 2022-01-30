@@ -4,25 +4,31 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Visualization2D
+
+public class Edge
 {
+    public Vector3 Start => points[0];
+    public Vector3 End => points[1];
 
+    public Vector3 Mid;
 
-    public class Edge
+    public float f;
+    public float g;
+
+    private Vector3[] points;
+
+    public Edge(Vector3 start, Vector3 end)
     {
-        public Vector2 Start => points[0];
-        public Vector2 End  => points[1];
+        points = new[] {start, end};
 
-        private Vector2[] points;
+        Mid = new Vector3((start.x + end.x) * 0.5f, (start.y + end.y) * 0.5f);
 
-        public Edge(Vector2 start, Vector2 end)
-        {
-            points = new[] {start, end};
-        }
+        f = (start.x - end.x) / (end.y - start.y);
+        g = Mid.y - f * Mid.x;
+    }
 
-        public bool Equals(Edge other)
-        {
-            return !(points.Except(other.points).Any());
-        }
+    public bool Equals(Edge other)
+    {
+        return !(points.Except(other.points).Any());
     }
 }
