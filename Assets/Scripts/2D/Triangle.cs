@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Visualization2D
 {
-    public class Triangle
+    public struct Triangle
     {
         public Vector3 V1 => points[0];
         public Vector3 V2 => points[1];
@@ -17,7 +17,7 @@ namespace Visualization2D
         public Vector3 Circumcenter;
         public float Radius;
 
-        public Triangle(Vector3 v1, Vector3 v2, Vector3 v3)
+        public Triangle(Vector3 v1, Vector3 v2, Vector3 v3) : this()
         {
             points = new[] {v1, v2, v3};
             CalculateCircumcenter();

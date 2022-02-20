@@ -35,7 +35,7 @@ public class BowyerWatson2DControl : MonoBehaviour
 
             // var x = RandomGaussian(0, width);
             // var y = RandomGaussian(0, height);
-            _points.Add(new Vector3(x, y, 0));
+            //_points.Add(new Vector3(x, y, 0));
 
 
             //Add Control Points
@@ -45,13 +45,19 @@ public class BowyerWatson2DControl : MonoBehaviour
             // _points.Add(new Vector3(x, -2 * height - y));
         }
 
-        // _points.Add(new Vector3(-7.8f, -1.5f, -7.7f));
-        // _points.Add(new Vector3(-1.2f, 1.0f, -0.8f));
-        // _points.Add(new Vector3(-0.2f, 1.1f, -0.4f));
+        _points.Add(new Vector3(6.4f, 4.0f, 4.3f));
+        _points.Add(new Vector3(3.6f, 4.0f, 4.3f));
+        _points.Add(new Vector3(1.4f, 4.0f, 4.3f));
+        _points.Add(new Vector3(6.4f, 4.0f, -0.7f));
+        _points.Add(new Vector3(4.2f, 4.0f, -0.7f));
+        _points.Add(new Vector3(1.4f, 4.0f, -0.7f));
+        _points.Add(new Vector3(1.4f, 4.0f, 1.5f));
+        _points.Add(new Vector3(6.4f, 4.0f, 2.1f));
 
 
-        //plane = new Plane(_points[0], _points[1], _points[2]);
-        plane = new Plane(Vector3.back, Vector3.zero);
+
+        plane = new Plane(_points[0], _points[4], _points[7]);
+        //plane = new Plane(Vector3.back, Vector3.zero);
         bw = new BowyerWatson2D(_points, plane);
     }
 
@@ -94,12 +100,12 @@ public class BowyerWatson2DControl : MonoBehaviour
             Gizmos.DrawRay(point, plane.normal * 10);
         }
 
-        //Gizmos.color = Color.blue;
-        // foreach (var point in bw.RotatedPoints)
-        // {
-        //     Gizmos.DrawSphere(point, pointRadius);
-        //     Gizmos.DrawRay(point, Vector3.back * 10);
-        // }
+        Gizmos.color = Color.blue;
+         foreach (var point in bw.RotatedPoints)
+         {
+             Gizmos.DrawSphere(point, pointRadius);
+             Gizmos.DrawRay(point, Vector3.back * 10);
+         }
 
         // Gizmos.color = Color.magenta;
         // foreach (var point in bw.RevertedPoints)

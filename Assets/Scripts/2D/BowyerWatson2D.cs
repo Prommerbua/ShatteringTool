@@ -157,7 +157,7 @@ public class BowyerWatson2D
         for (var index = 0; index < Points.Count; index++)
         {
             Vector3 point = rotationQuat * Points[index];
-            // RotatedPoints.Add(point);
+            RotatedPoints.Add(point);
             badTriangles.Clear();
 
             foreach (var triangle in Triangulation)

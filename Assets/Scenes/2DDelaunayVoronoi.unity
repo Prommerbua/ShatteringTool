@@ -258,7 +258,7 @@ MonoBehaviour:
   drawCircumcenter: 0
   width: 100
   height: 50
-  pointCount: 30
+  pointCount: 8
 --- !u!4 &854619673
 Transform:
   m_ObjectHideFlags: 0
