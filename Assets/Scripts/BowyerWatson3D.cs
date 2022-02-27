@@ -364,340 +364,409 @@ public class BowyerWatson3D : MonoBehaviour
             triangles.Add(t);
         }
 
-        var lowerTris = triangles.ToList();
-        var upperTris = triangles.ToList();
 
         List<Vector3> tmpVertices = new List<Vector3>();
-        foreach (var voronoiFace in cell1.Faces.Take(1))
+        List<List<Triangle>> cutMeshes = new List<List<Triangle>>();
+        cutMeshes.Add(triangles);
+
+        //Cell
+        foreach (var voronoiCell in voronoiCells.Take(1))
         {
-            List<Vector3> fillVertices = new List<Vector3>();
-
-            foreach (var triangle in triangles)
+            //Plane
+            foreach (var voronoiFace in voronoiCell.Faces.Take(1))
             {
-                List<Vector3> newVerts = new List<Vector3>();
-                foreach (var edge in triangle.GetEdges())
+                List<Vector3> fillVertices = new List<Vector3>();
+                var cutMeshestmp = cutMeshes.ToList();
+
+                foreach (var cutMesh in cutMeshestmp)
                 {
-                    //Check if edge is intersecting with plane of face
-                    var d = Vector3.Dot(voronoiFace.points[0] - edge.Start, voronoiFace.Plane.normal) /
-                            Vector3.Dot(edge.End - edge.Start, voronoiFace.Plane.normal);
+                    var lowerTris = cutMesh.ToList();
+                    var upperTris = cutMesh.ToList();
 
-                    //if intersecting, calculate new vertices with interpolation
-                    if (d >= 0 && d <= 1)
+                    foreach (var triangle in cutMesh)
                     {
-                        var newVert = edge.End * d + edge.Start * (1 - d);
-                        newVerts.Add(newVert);
-                        PlaneLineintersections.Add(newVert);
+                        List<Vector3> newVerts = new List<Vector3>();
+                        foreach (var edge in triangle.GetEdges())
+                        {
+                            //Check if edge is intersecting with plane of face
+                            var d = Vector3.Dot(voronoiFace.points[0] - edge.Start, voronoiFace.Plane.normal) /
+                                    Vector3.Dot(edge.End - edge.Start, voronoiFace.Plane.normal);
+
+                            //if intersecting, calculate new vertices with interpolation
+                            if (d >= 0 && d <= 1)
+                            {
+                                var newVert = edge.End * d + edge.Start * (1 - d);
+                                newVerts.Add(newVert);
+                                PlaneLineintersections.Add(newVert);
+                            }
+                        }
+
+                        fillVertices.AddRange(newVerts);
+
+                        var trianglePlane = new Plane(triangle.V1, triangle.V2, triangle.V3);
+
+                        bool isV1Above = voronoiFace.Plane.GetSide(triangle.V1);
+                        bool isV2Above = voronoiFace.Plane.GetSide(triangle.V2);
+                        bool isV3Above = voronoiFace.Plane.GetSide(triangle.V3);
+
+                        tmpVertices.Clear();
+
+                        if (isV1Above && isV2Above && !isV3Above)
+                        {
+                            Debug.Log("Case 1");
+
+                            #region Case1
+
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+
+
+                            //Upper (Quad)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+                            tmpVertices.Add(triangle.V2);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            //Lower (Triangle)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V3);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            #endregion
+                        }
+                        else if (isV1Above && !isV2Above && isV3Above)
+                        {
+                            Debug.Log("Case 2");
+
+                            #region Case2
+
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+
+                            //Upper (Quad)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(triangle.V1);
+                            tmpVertices.Add(triangle.V3);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            //Lower (Triangle)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V2);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            #endregion
+                        }
+                        else if (isV1Above && !isV2Above && !isV3Above)
+                        {
+                            Debug.Log("Case 3");
+
+                            #region Case3
+
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+
+                            //Lower (Quad)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V2);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(triangle.V2);
+                            tmpVertices.Add(triangle.V3);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            //Upper (Triangle)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            #endregion
+                        }
+                        else if (!isV1Above && isV2Above && isV3Above)
+                        {
+                            Debug.Log("Case 4");
+
+                            #region Case4
+
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+
+                            //Upper (Quad)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V2);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(triangle.V2);
+                            tmpVertices.Add(triangle.V3);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            //Lower (Triangle)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            #endregion
+                        }
+                        else if (!isV1Above && isV2Above && !isV3Above)
+                        {
+                            Debug.Log("Case 5");
+
+                            #region Case5
+
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+
+                            //Lower (Quad)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(triangle.V1);
+                            tmpVertices.Add(triangle.V3);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            //Upper (Triangle)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V2);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            #endregion
+                        }
+                        else if (!isV1Above && !isV2Above && isV3Above)
+                        {
+                            Debug.Log("Case 6");
+
+                            #region Case6
+
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+
+                            //Lower (Quad)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V1);
+                            tmpVertices.Add(triangle.V2);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            //Upper (Triangle)
+                            tmpVertices.Clear();
+                            tmpVertices.Add(newVerts[1]);
+                            tmpVertices.Add(newVerts[0]);
+                            tmpVertices.Add(triangle.V3);
+
+                            if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                                 trianglePlane.normal).sqrMagnitude < 2)
+                            {
+                                tmpVertices.Reverse();
+                            }
+
+                            upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+
+                            #endregion
+                        }
+                        else if (isV1Above && isV2Above && isV3Above)
+                        {
+                            Debug.Log("No Intersection - All Above");
+                            lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                        }
+                        else if (!isV1Above && !isV2Above && !isV3Above)
+                        {
+                            Debug.Log("No Intersection - All below");
+                            upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
+                        }
+                        else
+                        {
+                            Debug.Log("Case missing: " + isV1Above + isV2Above + isV3Above);
+                        }
                     }
+
+                    //fill holes for both sides
+                    fillVertices = fillVertices.Distinct().ToList();
+                    //var fillPlane = new Plane(fillVertices[0], fillVertices[1], fillVertices[3]);
+                    var bw = new BowyerWatson2D(fillVertices, voronoiFace.Plane);
+
+                    foreach (var triangle in bw.Triangulation)
+                    {
+                        tmpVertices.Clear();
+                        tmpVertices.Add(triangle.V1);
+                        tmpVertices.Add(triangle.V2);
+                        tmpVertices.Add(triangle.V3);
+
+                        if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                             voronoiFace.Plane.normal).sqrMagnitude < 2)
+                        {
+                            tmpVertices.Reverse();
+                        }
+
+                        lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+                        tmpVertices.Reverse();
+                        upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+                    }
+
+                    cutMeshes.Remove(cutMesh);
+                    cutMeshes.Add(lowerTris);
+                    cutMeshes.Add(upperTris);
                 }
-
-                fillVertices.AddRange(newVerts);
-
-                var trianglePlane = new Plane(triangle.V1, triangle.V2, triangle.V3);
-
-                bool isV1Above = voronoiFace.Plane.GetSide(triangle.V1);
-                bool isV2Above = voronoiFace.Plane.GetSide(triangle.V2);
-                bool isV3Above = voronoiFace.Plane.GetSide(triangle.V3);
-
-                tmpVertices.Clear();
-
-                if (isV1Above && isV2Above && !isV3Above)
-                {
-                    Debug.Log("Case 1");
-
-                    #region Case1
-
-                    lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                    upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-
-
-                    //Upper (Quad)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V1);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(triangle.V1);
-                    tmpVertices.Add(triangle.V2);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    //Lower (Triangle)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V3);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    #endregion
-                }
-                else if (isV1Above && !isV2Above && isV3Above)
-                {
-                    Debug.Log("Case 2");
-
-                    #region Case2
-
-                    lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                    upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-
-                    //Upper (Quad)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V1);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(triangle.V1);
-                    tmpVertices.Add(triangle.V3);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    //Lower (Triangle)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V2);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    #endregion
-                }
-                else if (isV1Above && !isV2Above && !isV3Above)
-                {
-                    Debug.Log("Case 3");
-
-                    #region Case3
-
-                    lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                    upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-
-                    //Lower (Quad)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V2);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(triangle.V2);
-                    tmpVertices.Add(triangle.V3);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    //Upper (Triangle)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V1);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    #endregion
-                }
-                else if (!isV1Above && isV2Above && isV3Above)
-                {
-                    Debug.Log("Case 4");
-
-                    #region Case4
-
-                    lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                    upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-
-                    //Upper (Quad)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V2);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(triangle.V2);
-                    tmpVertices.Add(triangle.V3);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    //Lower (Triangle)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V1);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    #endregion
-                }
-                else if (!isV1Above && isV2Above && !isV3Above)
-                {
-                    Debug.Log("Case 5");
-
-                    #region Case5
-
-                    lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                    upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-
-                    //Lower (Quad)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V1);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(triangle.V1);
-                    tmpVertices.Add(triangle.V3);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    //Upper (Triangle)
-                    tmpVertices.Clear();
-                    tmpVertices.Add(newVerts[1]);
-                    tmpVertices.Add(newVerts[0]);
-                    tmpVertices.Add(triangle.V2);
-
-                    if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                         trianglePlane.normal).sqrMagnitude < 2)
-                    {
-                        tmpVertices.Reverse();
-                    }
-
-                    upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-
-                    #endregion
-                }
-                else if (isV1Above && isV2Above && isV3Above)
-                {
-                    Debug.Log("No Intersection - All Above");
-                    lowerTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                }
-                else if (!isV1Above && !isV2Above && !isV3Above)
-                {
-                    Debug.Log("No Intersection - All below");
-                    upperTris.RemoveAll(t => t.HasVertex(triangle.V1) && t.HasVertex(triangle.V2) && t.HasVertex(triangle.V3));
-                }
-                else
-                {
-                    Debug.Log("Case missing: " + isV1Above + isV2Above + isV3Above);
-                }
-            }
-
-            //fill holes for both sides
-            fillVertices = fillVertices.Distinct().ToList();
-            var fillPlane = new Plane(fillVertices[0], fillVertices[1], fillVertices[3]);
-            var bw = new BowyerWatson2D(fillVertices, fillPlane);
-
-            foreach (var triangle in bw.Triangulation)
-            {
-                tmpVertices.Clear();
-                tmpVertices.Add(triangle.V1);
-                tmpVertices.Add(triangle.V2);
-                tmpVertices.Add(triangle.V3);
-
-                if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                     fillPlane.normal).sqrMagnitude < 2)
-                {
-                    tmpVertices.Reverse();
-                }
-
-                upperTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-                tmpVertices.Reverse();
-                lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
             }
         }
 
@@ -705,68 +774,39 @@ public class BowyerWatson3D : MonoBehaviour
         // var originalRotation = meshToCut.transform.rotation;
         // var originalScale = meshToCut.transform.localScale;
 
-        tmpVertices.Clear();
-        var meshVertices = new List<Vector3>();
-        var meshTris = new List<int>();
-
-        foreach (var triangle in upperTris)
+        foreach (var fragment in cutMeshes)
         {
             tmpVertices.Clear();
-            tmpVertices.Add(triangle.V1);
-            tmpVertices.Add(triangle.V2);
-            tmpVertices.Add(triangle.V3);
+            var meshVertices = new List<Vector3>();
+            var meshTris = new List<int>();
 
-            meshVertices.AddRange(tmpVertices.ToList());
+            foreach (var triangle in fragment)
+            {
+                tmpVertices.Clear();
+                tmpVertices.Add(triangle.V1);
+                tmpVertices.Add(triangle.V2);
+                tmpVertices.Add(triangle.V3);
 
-            meshTris.Add(meshVertices.Count - 1);
-            meshTris.Add(meshVertices.Count - 3);
-            meshTris.Add(meshVertices.Count - 2);
+                meshVertices.AddRange(tmpVertices.ToList());
+
+                meshTris.Add(meshVertices.Count - 1);
+                meshTris.Add(meshVertices.Count - 3);
+                meshTris.Add(meshVertices.Count - 2);
+            }
+
+            var upperMesh = new Mesh();
+            upperMesh.vertices = meshVertices.ToArray();
+            upperMesh.triangles = meshTris.ToArray();
+            upperMesh.RecalculateNormals();
+
+            var go = new GameObject("Fragment");
+            // go.transform.position = originalPosition;
+            // go.transform.rotation = originalRotation;
+            // go.transform.localScale = originalScale;
+            go.AddComponent<MeshFilter>().mesh = upperMesh;
+            go.AddComponent<MeshCollider>().sharedMesh = upperMesh;
+            go.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
         }
-
-        var upperMesh = new Mesh();
-        upperMesh.vertices = meshVertices.ToArray();
-        upperMesh.triangles = meshTris.ToArray();
-        upperMesh.RecalculateNormals();
-
-        var go = new GameObject("Upper");
-        // go.transform.position = originalPosition;
-        // go.transform.rotation = originalRotation;
-        // go.transform.localScale = originalScale;
-        go.AddComponent<MeshFilter>().mesh = upperMesh;
-        go.AddComponent<MeshCollider>().sharedMesh = upperMesh;
-        go.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-
-
-        tmpVertices.Clear();
-        meshVertices.Clear();
-        meshTris.Clear();
-
-        foreach (var triangle in lowerTris)
-        {
-            tmpVertices.Clear();
-            tmpVertices.Add(triangle.V1);
-            tmpVertices.Add(triangle.V2);
-            tmpVertices.Add(triangle.V3);
-
-            meshVertices.AddRange(tmpVertices.ToList());
-
-            meshTris.Add(meshVertices.Count - 1);
-            meshTris.Add(meshVertices.Count - 3);
-            meshTris.Add(meshVertices.Count - 2);
-        }
-
-        var lowerMesh = new Mesh();
-        lowerMesh.vertices = meshVertices.ToArray();
-        lowerMesh.triangles = meshTris.ToArray();
-        lowerMesh.RecalculateNormals();
-
-        var go2 = new GameObject("Lower");
-        // go2.transform.position = originalPosition;
-        // go2.transform.rotation = originalRotation;
-        // go2.transform.localScale = originalScale;
-        go2.AddComponent<MeshFilter>().mesh = lowerMesh;
-        go2.AddComponent<MeshCollider>().sharedMesh = lowerMesh;
-        go2.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
 
         meshToCut.SetActive(false);
     }
@@ -878,7 +918,7 @@ public class BowyerWatson3D : MonoBehaviour
 
 
         Gizmos.color = Color.red;
-        foreach (var triangle in triangles.Take(4))
+        foreach (var triangle in triangles.Skip(8).Take(2))
         {
             Gizmos.DrawLine(triangle.V1, triangle.V2);
             Gizmos.DrawLine(triangle.V2, triangle.V3);
@@ -963,9 +1003,9 @@ public class BowyerWatson3D : MonoBehaviour
         {
             if (drawVoronoi)
             {
-                foreach (var voronoiCell in voronoiCells)
+                foreach (var voronoiCell in voronoiCells.Take(1))
                 {
-                    foreach (var voronoiFace in voronoiCell.Faces)
+                    foreach (var voronoiFace in voronoiCell.Faces.Take(1))
                     {
                         for (int i = 0; i < voronoiFace.points.Count; i++)
                         {
