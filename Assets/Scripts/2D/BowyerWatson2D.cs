@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Visualization2D;
 
 
 public class BowyerWatson2D
@@ -143,7 +142,6 @@ public class BowyerWatson2D
         center = center / circumcenters.Count;
 
 
-
         circumcenters = circumcenters.OrderBy(t => Math.Atan2(t.y - center.y, t.x - center.y)).ToList();
     }
 
@@ -152,7 +150,6 @@ public class BowyerWatson2D
     {
         List<Triangle> badTriangles = new List<Triangle>();
         List<Edge> polygon = new List<Edge>();
-        List<Triangle> toRemove = new List<Triangle>();
 
         for (var index = 0; index < Points.Count; index++)
         {
@@ -187,24 +184,27 @@ public class BowyerWatson2D
 
             foreach (var edge in polygon)
             {
-                Triangulation.Add(new Triangle(edge.Start, edge.End, point));
+                if (edge.Start != edge.End)
+                {
+                    Triangulation.Add(new Triangle(edge.Start, edge.End, point));
+                }
             }
         }
 
-        for (int index = 0; index < Triangulation.Count; index++)
-        {
-            var triangle = Triangulation[index];
-            if (triangle.HasVertex(_superTri.V1) || triangle.HasVertex(_superTri.V2) || triangle.HasVertex(_superTri.V3))
-            {
-                toRemove.Add(triangle);
-            }
-        }
+        // for (int index = 0; index < Triangulation.Count; index++)
+        // {
+        //     var triangle = Triangulation[index];
+        //     if (triangle.HasVertex(_superTri.V1) || triangle.HasVertex(_superTri.V2) || triangle.HasVertex(_superTri.V3))
+        //     {
+        //         toRemove.Add(triangle);
+        //     }
+        // }
 
-        Triangulation.RemoveAll(t => toRemove.Contains(t));
+        //Triangulation.RemoveAll(t => toRemove.Contains(t));
+        Triangulation.RemoveAll(t => t.HasVertex(_superTri.V1) || t.HasVertex(_superTri.V2) || t.HasVertex(_superTri.V3));
 
         for (var index = 0; index < Triangulation.Count; index++)
         {
-
             var triangle = Triangulation[index];
             RotatedTriangulation.Add(triangle);
             var vertices = triangle.GetVertices();

@@ -4,41 +4,43 @@ using Habrador_Computational_Geometry;
 using UnityEditor;
 using UnityEngine;
 
-public class SutherlandHodgman2D : MonoBehaviour
+public class SutherlandHodgman2D
 {
     public float width;
     public float height;
 
-    private List<Vector3> subjectPolygon = new List<Vector3>();
-    private List<Edge> clipPolygon = new List<Edge>();
+    public List<Vector3> subjectPolygon = new List<Vector3>();
+    public List<Edge> clipPolygon = new List<Edge>();
 
     List<Vector3> outputList = new List<Vector3>();
 
     Vector3 intersection;
 
+    public SutherlandHodgman2D(List<Vector3> subjectPolygon, List<Edge> clipPolygon)
+    {
+        this.subjectPolygon = subjectPolygon;
+        this.clipPolygon = clipPolygon;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        subjectPolygon.Add(new Vector3(10, 10));
-        subjectPolygon.Add(new Vector3(-7, 15));
-        subjectPolygon.Add(new Vector3(-10, -6));
-        subjectPolygon.Add(new Vector3(8, -5));
-
-
-        clipPolygon.Add(new Edge(new Vector3(0, 0), new Vector3(0, height)));
-        clipPolygon.Add(new Edge(new Vector3(0, height), new Vector3(width, height)));
-        clipPolygon.Add(new Edge(new Vector3(width, height), new Vector3(width, 0)));
-        clipPolygon.Add(new Edge(new Vector3(width, 0), new Vector3(0, 0)));
-
-
-
-        var tmp = IsInside(new Vector3(0,0), new Vector3(0,10), new Vector3(1, 5));
-
+        // subjectPolygon.Add(new Vector3(10, 10));
+        // subjectPolygon.Add(new Vector3(-7, 15));
+        // subjectPolygon.Add(new Vector3(-10, -6));
+        // subjectPolygon.Add(new Vector3(8, -5));
+        //
+        //
+        // clipPolygon.Add(new Edge(new Vector3(0, 0), new Vector3(0, height)));
+        // clipPolygon.Add(new Edge(new Vector3(0, height), new Vector3(width, height)));
+        // clipPolygon.Add(new Edge(new Vector3(width, height), new Vector3(width, 0)));
+        // clipPolygon.Add(new Edge(new Vector3(width, 0), new Vector3(0, 0)));
+        //var tmp = IsInside(new Vector3(0,0), new Vector3(0,10), new Vector3(1, 5));
 
         ClipPolygon();
     }
 
-    private void ClipPolygon()
+    public List<Vector3> ClipPolygon()
     {
         outputList = subjectPolygon.ToList();
         foreach (var clipEdge in clipPolygon)
@@ -54,27 +56,29 @@ public class SutherlandHodgman2D : MonoBehaviour
                 if (index < 0) index = inputList.Count - 1;
                 Vector3 prevPoint = inputList[index];
 
-                var isCurrentInside = IsInside(clipEdge.Start, clipEdge.End, currentPoint);
-                var isPrevInside = IsInside(clipEdge.Start, clipEdge.End, prevPoint);
+                var isCurrentInside = !IsInside(clipEdge.Start, clipEdge.End, currentPoint);
+                var isPrevInside = !IsInside(clipEdge.Start, clipEdge.End, prevPoint);
 
 
                 Vector3 intersection = Vector3.zero;
                 var intersect = ComputeIntersection(out intersection, prevPoint, currentPoint, clipEdge);
 
-                if (!isCurrentInside)
+                if (isCurrentInside)
                 {
-                    if (isPrevInside)
+                    if (!isPrevInside)
                     {
                         outputList.Add(intersection);
                     }
                     outputList.Add(currentPoint);
                 }
-                else if (!isPrevInside)
+                else if (isPrevInside)
                 {
                     outputList.Add(intersection);
                 }
             }
         }
+
+        return outputList;
     }
 
     private bool ComputeIntersection(out Vector3 intersection, Vector3 prevPoint, Vector3 point, Edge clipEdge)

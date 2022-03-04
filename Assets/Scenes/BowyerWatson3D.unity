@@ -341,7 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad3b4df501102fb41b3b517d1a905494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointCount: 10
+  pointCount: 20
   drawVoronoi: 0
   drawDelaunay: 0
   drawVoronoiNodes: 0
@@ -449,7 +449,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1117811656}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.91, y: 3.67, z: 1.8}
+  m_LocalPosition: {x: 3.73, y: 3.39, z: -1.19}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_Children: []
   m_Father: {fileID: 0}

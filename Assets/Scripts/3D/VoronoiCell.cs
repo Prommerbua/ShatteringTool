@@ -7,6 +7,12 @@ public struct VoronoiCell
     public Vector3 Generator;
     public List<VoronoiFace> Faces;
 
+    public VoronoiCell(List<VoronoiFace> faces)
+    {
+        this.Faces = faces;
+        Generator = Vector3.zero;
+    }
+
     public VoronoiCell(Vector3 generator, List<VoronoiFace> faces)
     {
         Generator = generator;

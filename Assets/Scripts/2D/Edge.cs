@@ -7,8 +7,17 @@ using UnityEngine;
 
 public class Edge
 {
-    public Vector3 Start => points[0];
-    public Vector3 End => points[1];
+    public Vector3 Start
+    {
+        get => points[0];
+        set => points[0] = value;
+    }
+
+    public Vector3 End
+    {
+        get => points[1];
+        set => points[1] = value;
+    }
 
     public Vector3 Mid;
 
