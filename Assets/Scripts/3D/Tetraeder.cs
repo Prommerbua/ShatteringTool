@@ -11,6 +11,7 @@ public struct Tetraeder
     public Vector3 p4 => points[3];
 
     private Vector3[] points;
+    private List<Tetraeder> neighbors;
 
     public bool isBad;
 
@@ -20,6 +21,7 @@ public struct Tetraeder
     public Tetraeder(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4) : this()
     {
         points = new[] {p1, p2, p3, p4};
+        neighbors = new List<Tetraeder>();
 
         calculateCircumsphere();
     }

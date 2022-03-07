@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using HullDelaunayVoronoi.Hull;
+using Unity.Profiling;
+using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -13,6 +16,9 @@ public class BowyerWatson3D : MonoBehaviour
     List<VoronoiFace> voronoiFaces = new List<VoronoiFace>();
     List<VoronoiCell> voronoiCells = new List<VoronoiCell>();
     private Tetraeder supertetra;
+
+    const float EPSILON = 0.0001f;
+
 
 
     //List<Vector3> voronoiVertices = new List<Vector3>();
@@ -26,6 +32,7 @@ public class BowyerWatson3D : MonoBehaviour
     [SerializeField] private bool drawDelaunay;
     [SerializeField] private bool drawVoronoiNodes;
     [SerializeField] private GameObject meshToCut;
+    [SerializeField] private Material material;
 
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
@@ -37,7 +44,8 @@ public class BowyerWatson3D : MonoBehaviour
     Vector3 intersectionPoint;
     Vector3 intersectionDir;
 
-    private List<Vector3> ClippedCells = new List<Vector3>();
+    private List<Vector3> Intersections = new List<Vector3>();
+    private List<Triangle> IntersectionsTris = new List<Triangle>();
     private bool _broken = false;
     private Rigidbody _rb;
 
@@ -91,17 +99,12 @@ public class BowyerWatson3D : MonoBehaviour
         stopWatch.Start();
         StartAlgorithm();
         stopWatch.Stop();
-        Debug.Log("Bowyer Watson Calculation: " + stopWatch.Elapsed);
+        Debug.Log("Bowyer-Watson: " + stopWatch.Elapsed);
 
         stopWatch.Restart();
         CreateVoronoi();
         stopWatch.Stop();
         Debug.Log("Voronoi Conversion: " + stopWatch.Elapsed);
-
-
-
-
-        //CutMesh(meshToCut);
 
         // stopWatch.Restart();
         // VoronoiToMesh();
@@ -145,7 +148,7 @@ public class BowyerWatson3D : MonoBehaviour
 
         CreateVoronoi();
 
-        //CutMeshv2(meshToCut);
+        CutMeshv2(meshToCut);
     }
 
 
@@ -161,13 +164,18 @@ public class BowyerWatson3D : MonoBehaviour
             var point = points[index];
             badTetraeder.Clear();
 
-            foreach (var tetraeder in triangulation)
+            for (var i = 0; i < triangulation.Count; i++)
             {
+                var tetraeder = triangulation[i];
                 if (tetraeder.IsPointInsideCircumSphere(point))
                 {
                     badTetraeder.Add(tetraeder);
+                    // tetraeder.isBad = true;
+                    // triangulation[i] = tetraeder;
+                    // break;
                 }
             }
+
 
             polygon.Clear();
 
@@ -444,7 +452,6 @@ public class BowyerWatson3D : MonoBehaviour
                         {
                             var newVert = edge.End * d + edge.Start * (1 - d);
                             newVerts.Add(newVert);
-                            //PlaneLineintersections.Add(newVert);
                         }
                     }
 
@@ -459,6 +466,8 @@ public class BowyerWatson3D : MonoBehaviour
 
                     if (isV1Above && isV2Above && !isV3Above)
                     {
+                        //Debug.Log("Case 1");
+
                         #region Case1
 
                         fillVertices.AddRange(newVerts);
@@ -517,6 +526,9 @@ public class BowyerWatson3D : MonoBehaviour
                     }
                     else if (isV1Above && !isV2Above && isV3Above)
                     {
+                        //Debug.Log("Case 2");
+
+
                         #region Case2
 
                         fillVertices.AddRange(newVerts);
@@ -575,6 +587,8 @@ public class BowyerWatson3D : MonoBehaviour
                     }
                     else if (isV1Above && !isV2Above && !isV3Above)
                     {
+                        //Debug.Log("Case 3");
+
                         #region Case3
 
                         fillVertices.AddRange(newVerts);
@@ -633,6 +647,8 @@ public class BowyerWatson3D : MonoBehaviour
                     }
                     else if (!isV1Above && isV2Above && isV3Above)
                     {
+                        //Debug.Log("Case 4");
+
                         #region Case4
 
                         fillVertices.AddRange(newVerts);
@@ -691,6 +707,8 @@ public class BowyerWatson3D : MonoBehaviour
                     }
                     else if (!isV1Above && isV2Above && !isV3Above)
                     {
+                        //Debug.Log("Case 5");
+
                         #region Case5
 
                         fillVertices.AddRange(newVerts);
@@ -749,6 +767,8 @@ public class BowyerWatson3D : MonoBehaviour
                     }
                     else if (!isV1Above && !isV2Above && isV3Above)
                     {
+                        //Debug.Log("Case 6");
+
                         #region Case6
 
                         fillVertices.AddRange(newVerts);
@@ -820,25 +840,54 @@ public class BowyerWatson3D : MonoBehaviour
                 }
 
                 //fill hole
-                fillVertices = fillVertices.GroupBy(vector => new Vector3((float) Math.Round(vector.x, 3), (float) Math.Round(vector.y, 3),(float) Math.Round(vector.z, 3))).Select(g => g.First()).ToList();
+                if (fillVertices.Any())
+                {
+                    fillVertices = fillVertices
+                        .GroupBy(vector => new Vector3((float) Math.Round(vector.x, 2), (float) Math.Round(vector.y, 2),
+                            (float) Math.Round(vector.z, 2))).Select(g => g.First()).ToList();
+                    fillVertices = SortPointsOnPlane(voronoiFace, fillVertices);
+                    fillVertices = FilterUnnecessaryPoints(fillVertices);
 
-                var bw = new BowyerWatson2D(fillVertices, voronoiFace.Plane);
+                    Intersections.AddRange(fillVertices);
 
-                 foreach (var triangle in bw.Triangulation)
-                 {
-                     tmpVertices.Clear();
-                     tmpVertices.Add(triangle.V1);
-                     tmpVertices.Add(triangle.V2);
-                     tmpVertices.Add(triangle.V3);
 
-                     if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
-                          voronoiFace.Plane.normal).sqrMagnitude < 2)
-                     {
-                         tmpVertices.Reverse();
-                     }
+                    for (int i = 1; i + 1 < fillVertices.Count; i++)
+                    {
+                        tmpVertices.Clear();
+                        tmpVertices.Add(fillVertices[0]);
+                        tmpVertices.Add(fillVertices[i]);
+                        tmpVertices.Add(fillVertices[i + 1]);
 
-                     lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
-                 }
+                        if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                             voronoiFace.Plane.normal).sqrMagnitude < 2)
+                        {
+                            tmpVertices.Reverse();
+                        }
+
+                        lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+                        IntersectionsTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+                    }
+
+
+
+                    // var bw = new BowyerWatson2D(fillVertices, voronoiFace.Plane);
+                    //
+                    //  foreach (var triangle in bw.Triangulation)
+                    //  {
+                    //      tmpVertices.Clear();
+                    //      tmpVertices.Add(triangle.V1);
+                    //      tmpVertices.Add(triangle.V2);
+                    //      tmpVertices.Add(triangle.V3);
+                    //
+                    //      if ((Vector3.Cross(tmpVertices[1] - tmpVertices[0], tmpVertices[2] - tmpVertices[0]).normalized +
+                    //           voronoiFace.Plane.normal).sqrMagnitude < 2)
+                    //      {
+                    //          tmpVertices.Reverse();
+                    //      }
+                    //
+                    //      lowerTris.Add(new Triangle(tmpVertices[2], tmpVertices[0], tmpVertices[1]));
+                    //  }
+                }
             }
 
             if (!lowerTris.Any()) continue;
@@ -865,6 +914,7 @@ public class BowyerWatson3D : MonoBehaviour
             var upperMesh = new Mesh();
             upperMesh.vertices = meshVertices.ToArray();
             upperMesh.triangles = meshTris.ToArray();
+            //upperMesh.Optimize();
             upperMesh.RecalculateNormals();
 
             var go = new GameObject("Fragment");
@@ -874,9 +924,10 @@ public class BowyerWatson3D : MonoBehaviour
             go.AddComponent<MeshFilter>().mesh = upperMesh;
             go.AddComponent<MeshCollider>().sharedMesh = upperMesh;
             go.GetComponent<MeshCollider>().convex = true;
-            go.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+            go.AddComponent<MeshRenderer>().material = material;
             var rb = go.AddComponent<Rigidbody>();
             rb.AddExplosionForce(200.0f, meshToCut.transform.position, 10.0f);
+
 
             triangles = allTriangles.ToList();
         }
@@ -889,29 +940,48 @@ public class BowyerWatson3D : MonoBehaviour
         meshToCut.SetActive(false);
     }
 
-    private List<Vector3> SortPointsOnPlane(VoronoiFace voronoiFace, List<Vector3> fillVertices)
+    private List<Vector3> FilterUnnecessaryPoints(List<Vector3> fillVertices)
     {
-        var rotationQuat = Quaternion.FromToRotation(voronoiFace.Plane.normal, Vector3.back);
-        var inverseQuat = Quaternion.Inverse(rotationQuat);
-
-        List<Vector3> rotatedFillPoints = new List<Vector3>();
-        foreach (var vector3 in fillVertices)
+        var tmp = fillVertices.ToList();
+        for (int i = 0; i < fillVertices.Count; i++)
         {
-            rotatedFillPoints.Add(rotationQuat * vector3);
+            var A = fillVertices[i];
+            var B = fillVertices[(i + 1) % fillVertices.Count];
+            var C = fillVertices[(i + 2) % fillVertices.Count];
+
+
+
+            var AB = B - A;
+            var AC = C-A;
+
+            if (Math.Abs(Vector3.Cross(AB, AC).magnitude) < EPSILON)
+            {
+                tmp.Remove(B);
+            }
         }
 
+        return tmp;
+    }
+
+    private List<Vector3> SortPointsOnPlane(VoronoiFace voronoiFace, List<Vector3> fillVertices)
+    {
+        List<Vector3> sortedFillPoints = new List<Vector3>();
+
         Vector3 mid = Vector3.zero;
-        foreach (var vector3 in rotatedFillPoints)
+        foreach (var vector3 in fillVertices)
         {
             mid += vector3;
         }
 
-        mid /= points.Count;
+        mid /= fillVertices.Count;
 
-        rotatedFillPoints = rotatedFillPoints.OrderBy(t => Math.Atan2(t.y - mid.y, t.x - mid.y)).ToList();
-        rotatedFillPoints = rotatedFillPoints.Select(x => inverseQuat * x).ToList();
-        return rotatedFillPoints;
+        var refVec = (fillVertices[0] - mid);
+
+        return fillVertices.OrderBy(vert =>
+            Mathf.Sign(Vector3.Dot(Vector3.Cross(vert - mid, refVec), voronoiFace.Plane.normal)) *
+            Mathf.Atan2(Vector3.Cross((vert - mid), refVec).magnitude, Vector3.Dot((vert - mid), refVec))).ToList();
     }
+
 
     private void ComputePlanePlaneIntersection(out Vector3 intersectionPoint, out Vector3 intersectionDir, Plane cuttingPlane,
         Vector3 pointOnCuttinPlane, Plane trianglePlane, Vector3 pointOnTriangle)
@@ -938,7 +1008,7 @@ public class BowyerWatson3D : MonoBehaviour
 
 
         //Prevent divide by zero.
-        if (Mathf.Abs(numerator) > 0.000001f)
+        if (Mathf.Abs(numerator) > EPSILON)
         {
             Vector3 plane1ToPlane2 = pointOnCuttinPlane - pointOnTriangle;
             float t = Vector3.Dot(plane1Normal, plane1ToPlane2) / numerator;
@@ -967,17 +1037,38 @@ public class BowyerWatson3D : MonoBehaviour
     {
         Gizmos.color = Color.magenta;
 
+        GUIStyle g = new GUIStyle();
+        g.normal.textColor = Color.black;
+        g.fontSize = 500;
+
+
+
         Gizmos.DrawRay(intersectionPoint, intersectionDir * 10);
         Gizmos.DrawRay(intersectionPoint, -intersectionDir * 10);
 
-        Gizmos.color = Color.green;
-        if (ClippedCells.Count != 0)
-        {
-            foreach (var voronoiCell in ClippedCells)
-            {
-                Gizmos.DrawSphere(voronoiCell, 0.1f);
-            }
-        }
+        // Gizmos.color = Color.green;
+        // if (Intersections.Count != 0)
+        // {
+        //     for (var index = 0; index < Intersections.Count; index++)
+        //     {
+        //         var intersection = Intersections[index];
+        //         Gizmos.DrawSphere(intersection, 0.2f);
+        //         GUI.color = Color.black;
+        //         Handles.Label(intersection, index.ToString());
+        //     }
+        // }
+        // Gizmos.color = Color.cyan;
+        // if (IntersectionsTris.Count != 0)
+        // {
+        //     foreach (var intersectionTri in IntersectionsTris)
+        //     {
+        //         foreach (var edge in intersectionTri.GetEdges())
+        //         {
+        //             Gizmos.DrawLine(edge.Start, edge.End);
+        //         }
+        //     }
+        // }
+
 
         if (cell1.Faces == null) return;
         foreach (var face in cell1.Faces)
@@ -1019,7 +1110,7 @@ public class BowyerWatson3D : MonoBehaviour
         // }
 
 
-        if (triangulation != null)
+        if (triangulation != null && triangulation.Count > 1)
         {
             if (drawDelaunay)
             {
@@ -1061,7 +1152,7 @@ public class BowyerWatson3D : MonoBehaviour
         {
             if (drawVoronoi)
             {
-                foreach (var voronoiCell in voronoiCells)
+                foreach (var voronoiCell in voronoiCells.Take(1))
                 {
                     foreach (var voronoiFace in voronoiCell.Faces)
                     {

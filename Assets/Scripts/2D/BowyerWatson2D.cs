@@ -17,6 +17,7 @@ public class BowyerWatson2D
     public List<VoronoiFace> voronoiFaces = new List<VoronoiFace>();
 
 
+
     private Plane p;
 
     private Quaternion rotationQuat;

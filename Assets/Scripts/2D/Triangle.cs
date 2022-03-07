@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +70,15 @@ public struct Triangle
 
     public bool HasVertex(Vector3 vertex)
     {
+        foreach (var vector3 in points)
+        {
+            if (Mathf.Abs(Vector3.Distance(vector3, vertex)) < 0.0001f)
+            {
+                return true;
+            }
+        }
+        return false;
+
         return points.Contains(vertex);
     }
 
@@ -85,5 +95,20 @@ public struct Triangle
     public Edge[] GetEdges()
     {
         return new[] {new Edge(V1, V2), new Edge(V2, V3), new Edge(V3, V1)};
+    }
+
+    private bool Approximately(Vector3 me, Vector3 other, float allowedDifference)
+    {
+        var dx = me.x - other.x;
+        if (Mathf.Abs(dx) > allowedDifference)
+            return false;
+
+        var dy = me.y - other.y;
+        if (Mathf.Abs(dy) > allowedDifference)
+            return false;
+
+        var dz = me.z - other.z;
+
+        return Mathf.Abs(dz) >= allowedDifference;
     }
 }

@@ -312,7 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pointCount: 10
   drawVoronoi: 0
-  drawDelaunay: 1
+  drawDelaunay: 0
   drawVoronoiNodes: 0
   meshToCut: {fileID: 515221001}
 --- !u!1 &610805814

@@ -38,23 +38,19 @@ public struct VoronoiFace
 
     public void SortEdges()
     {
-        var rotationQuat = Quaternion.FromToRotation(Plane.normal, Vector3.back);
-        var inverseQuat = Quaternion.Inverse(rotationQuat);
-        List<Vector3> rotatedPoints = new List<Vector3>();
-        foreach (var vector3 in points)
-        {
-            rotatedPoints.Add(rotationQuat * vector3);
-        }
-
         Vector3 mid = Vector3.zero;
-        foreach (var vector3 in rotatedPoints)
+        foreach (var vector3 in points)
         {
             mid += vector3;
         }
 
         mid /= points.Count;
 
-        rotatedPoints = rotatedPoints.OrderBy(t => Math.Atan2(t.y - mid.y, t.x - mid.y)).ToList();
-        points = rotatedPoints.Select(x => inverseQuat * x).ToList();
+        var refVec = (points[0] - mid).normalized;
+
+        var p = this.Plane;
+        points = points.OrderBy(vert =>
+            Mathf.Sign(Vector3.Dot(Vector3.Cross(vert - mid, refVec), p.normal)) *
+            Mathf.Atan2(Vector3.Cross((vert - mid).normalized, refVec).magnitude, Vector3.Dot((vert - mid).normalized, refVec))).ToList();
     }
 }
