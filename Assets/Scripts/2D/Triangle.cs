@@ -1,34 +1,31 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Triangle
+
+public struct Triangle
 {
-    public Vector2 V1;
-    public Vector2 V2;
-    public Vector2 V3;
+    public Vector3 V1 => points[0];
+    public Vector3 V2 => points[1];
+    public Vector3 V3 => points[2];
 
-    public Edge E1;
-    public Edge E2;
-    public Edge E3;
+    private Vector3[] points;
 
-    private Vector2 _circumcirclePosition;
-    public float CircumcircleRadius;
 
-    public Triangle(Vector2 v1, Vector2 v2, Vector2 v3)
+    public Vector3 Circumcenter;
+    public float Radius;
+
+    public Triangle(Vector3 v1, Vector3 v2, Vector3 v3) : this()
     {
-        this.V1 = v1;
-        this.V2 = v2;
-        this.V3 = v3;
-
-        E1 = new Edge(V1, V2);
-        E2 = new Edge(V2, V3);
-        E3 = new Edge(V3, V1);
+        points = new[] {v1, v2, v3};
+        CalculateCircumcenter();
     }
 
-    public Vector2 CalculateCircumcirclePosition()
+    public void CalculateCircumcenter()
     {
-        var A = Vector2.zero;
+        var A = Vector3.zero;
         var B = V2 - V1;
         var C = V3 - V1;
 
@@ -37,42 +34,81 @@ public class Triangle
         var Ux = (C.y * (B.x * B.x + B.y * B.y) - B.y * (C.x * C.x + C.y * C.y)) / D;
         var Uy = (B.x * (C.x * C.x + C.y * C.y) - C.x * (B.x * B.x + B.y * B.y)) / D;
 
-        _circumcirclePosition = new Vector2(Ux,Uy) + V1;
-        CircumcircleRadius =    new Vector2(Ux, Uy).magnitude;
+        Circumcenter = new Vector3(Ux, Uy) + V1;
+        Radius = new Vector3(Ux, Uy).magnitude;
 
-
-        return new Vector2(Ux,Uy) + V1;
+        // var edges = GetEdges();
+        //
+        // Edge a = edges[0];
+        // Edge b = edges[1];
+        // float x = 0, y = 0;
+        // if (float.IsInfinity(a.f))
+        // {
+        //     x = a.Mid.x;
+        //     y = b.f * x + b.g;
+        // }
+        // else if (double.IsInfinity(b.f))
+        // {
+        //     x = b.Mid.x;
+        //     y = a.f * x + a.g;
+        // }
+        // else
+        // {
+        //     x = (b.g - a.g) / (a.f - b.f);
+        //     y = b.f * x + b.g;
+        // }
+        //
+        // Circumcenter = new Vector3(x, y);
+        // Radius = (new Vector3(V1.x, V2.y) - Circumcenter).magnitude;
     }
 
-    public Vector2 CalculateCentroidPosition()
+    public Vector3 CalculateCentroidPosition()
     {
-        var c =  (V1 + V2 + V3) / 3;
+        var c = (V1 + V2 + V3) / 3;
         return c;
     }
 
-    public bool IsPointInsideCircumcircle(Vector2 point)
+    public bool HasVertex(Vector3 vertex)
     {
-        var length = (_circumcirclePosition - point).magnitude;
-        return CircumcircleRadius - length > 0;
+        foreach (var vector3 in points)
+        {
+            if (Mathf.Abs(Vector3.Distance(vector3, vertex)) < 0.0001f)
+            {
+                return true;
+            }
+        }
+        return false;
+
+        return points.Contains(vertex);
     }
 
-    public List<Edge> GetEdges()
+    public bool IsPointInsideCircumcircle(Vector3 point)
     {
-        List<Edge> edges = new List<Edge>();
-
-        edges.Add(E1);
-        edges.Add(E2);
-        edges.Add(E3);
-        return edges;
+        return Radius - (point - Circumcenter).magnitude > 0;
     }
 
-    public List<Vector2> GetVertices()
+    public Vector3[] GetVertices()
     {
-        List<Vector2> vertices = new List<Vector2>();
+        return points;
+    }
 
-        vertices.Add(V1);
-        vertices.Add(V2);
-        vertices.Add(V3);
-        return vertices;
+    public Edge[] GetEdges()
+    {
+        return new[] {new Edge(V1, V2), new Edge(V2, V3), new Edge(V3, V1)};
+    }
+
+    private bool Approximately(Vector3 me, Vector3 other, float allowedDifference)
+    {
+        var dx = me.x - other.x;
+        if (Mathf.Abs(dx) > allowedDifference)
+            return false;
+
+        var dy = me.y - other.y;
+        if (Mathf.Abs(dy) > allowedDifference)
+            return false;
+
+        var dz = me.z - other.z;
+
+        return Mathf.Abs(dz) >= allowedDifference;
     }
 }

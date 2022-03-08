@@ -1,56 +1,23 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Face
+public struct Face
 {
-    public Edge2D incEdge;
+    private Vector3[] points;
 
-    public Face(Edge2D incEdge)
+    public Vector3 p1 => points[0];
+    public Vector3 p2 => points[1];
+    public Vector3 p3 => points[2];
+
+    public Face(Vector3 p1, Vector3 p2, Vector3 p3)
     {
-        this.incEdge = incEdge;
+        points = new[] {p1, p2, p3};
     }
 
-    private Vector2 _circumcirclePosition;
-    public float CircumcircleRadius;
-
-
-
-
-    public bool IsPointInsideCircumcircle(Vector2 point)
+    public bool Equals(Face other)
     {
-        var length = (_circumcirclePosition - point).magnitude;
-        return CircumcircleRadius - length > 0;
-    }
-
-    public Vector2 CalculateCentroidPosition()
-    {
-        var vertices = incEdge.GetTriangleVertices();
-        var v1 = vertices[0].Pos;
-        var v2 = vertices[1].Pos;
-        var v3 = vertices[2].Pos;
-
-        var c =  (v1 + v2 + v3) / 3;
-        return c;
-    }
-
-    public List<Edge2D> GetEdges()
-    {
-        List<Edge2D> edges = new List<Edge2D>();
-
-        edges.Add(incEdge);
-        edges.Add(incEdge.next);
-        edges.Add(incEdge.prev);
-        return edges;
-    }
-
-    public List<Vertex2D> GetVertices()
-    {
-        List<Vertex2D> vertices = new List<Vertex2D>();
-
-        vertices.Add(incEdge.org);
-        vertices.Add(incEdge.twin.org);
-        vertices.Add(incEdge.prev.org);
-        return vertices;
+        return !(points.Except(other.points).Any());
     }
 }
